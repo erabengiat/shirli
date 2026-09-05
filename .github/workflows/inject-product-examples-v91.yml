@@ -1,0 +1,34 @@
+name: Inject Product Examples v91
+on:
+  push:
+    paths:
+      - '.github/workflows/inject-product-examples-v91.yml'
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Inject script
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          p=Path('sw.js')
+          s=p.read_text(encoding='utf-8')
+          old="    if(!html.includes('shirli-v50-js')) html=html.replace('</body>',js+'\\n</body>');"
+          new="    if(!html.includes('shirli-v50-js')) html=html.replace('</body>',js+'\\n</body>');\n    if(!html.includes('product-examples.js')) html=html.replace('</body>','<script src=\"/shirli/product-examples.js?v=91\"></script>\\n</body>');"
+          if old not in s:
+              raise SystemExit('inject marker not found')
+          s=s.replace(old,new,1)
+          s=re.sub(r"const CACHE='shirli-v\d+';","const CACHE='shirli-v67';",s)
+          p.write_text(s,encoding='utf-8')
+          PY
+      - name: Commit
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add sw.js
+          git commit -m 'Inject product examples v91'
+          git push
