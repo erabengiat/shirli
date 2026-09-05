@@ -1,4 +1,4 @@
-name: Fix Shared Viewer to Shirley
+name: Compact Shirley Home Header
 on:
   push:
     paths:
@@ -6,7 +6,7 @@ on:
 permissions:
   contents: write
 jobs:
-  test:
+  patch:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -14,50 +14,19 @@ jobs:
           python - <<'PY'
           from pathlib import Path
           import re
-
-          p=Path('index.html')
+          p=Path('sw.js')
           s=p.read_text(encoding='utf-8')
-          replacements={
-            "b.textContent = 'תצוגה בלבד — האוסף של עירא';":"b.textContent = 'תצוגה בלבד — האוסף של שירלי';",
-            "return base + 'view.html?v=92';":"return base + 'index.html?view=1&share=1&v=93';",
-            "return 'סול קולאז\\' של עירא — אוסף הקולאז\\'ים\\n' + viewerURL();":"return 'האוסף של שירלי\\n' + viewerURL();",
-            "title: 'האוסף של\\' שירלי',":"title: 'האוסף של שירלי',",
-            "text: 'האוסף של עירא — לצפייה',":"text: 'האוסף של שירלי — לצפייה',",
-            "const subject = encodeURIComponent('סול קולאז\\' של עירא');":"const subject = encodeURIComponent('האוסף של שירלי');",
-            "'שלום,\\n\\nמזמינה אותך לצפות באוסף הקולאז\\'ים של עירא:\\n\\n' + viewerURL() + '\\n\\n'":"'שלום,\\n\\nמזמינה אותך לצפות באוסף של שירלי:\\n\\n' + viewerURL() + '\\n\\n'"
-          }
-          for old,new in replacements.items():
-            if old not in s:
-              raise SystemExit('missing index marker: '+old[:60])
-            s=s.replace(old,new,1)
-          s=s.replace("const APP_VERSION = 'v89';","const APP_VERSION = 'v93';")
+          old="#home .topbar{padding:8px 16px 4px!important;min-height:108px!important;flex:0 0 auto!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:4px!important}"
+          new="#home .topbar{padding:3px 16px 1px!important;min-height:76px!important;flex:0 0 auto!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:1px!important}"
+          if old not in s: raise SystemExit('missing topbar marker')
+          s=s.replace(old,new,1)
+          old2="#home .home-logo{display:block!important;width:70px!important;height:70px!important;min-width:70px!important;min-height:70px!important;border-radius:50%!important;background:url('shirley-logo.png') center/cover no-repeat!important;box-shadow:0 3px 10px rgba(42,58,71,.16)!important;margin:0 auto!important}"
+          new2="#home .home-logo{display:block!important;width:48px!important;height:48px!important;min-width:48px!important;min-height:48px!important;border-radius:50%!important;background:url('shirley-logo.png') center/cover no-repeat!important;box-shadow:0 2px 8px rgba(42,58,71,.14)!important;margin:0 auto!important}"
+          if old2 not in s: raise SystemExit('missing home-logo marker')
+          s=s.replace(old2,new2,1)
+          s=re.sub(r"const CACHE='shirli-v\d+';","const CACHE='shirli-v70';",s,1)
           p.write_text(s,encoding='utf-8')
-
-          v=Path('view.html')
-          v.write_text('''<!doctype html>
-<html lang="he" dir="rtl">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>האוסף של שירלי — תצוגה</title>
-<meta property="og:title" content="האוסף של שירלי">
-<meta property="og:description" content="האוסף של שירלי רגב">
-<meta property="og:image" content="https://erabengiat.github.io/shirli/shirley-logo.png?v=93">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://erabengiat.github.io/shirli/shirley-logo.png?v=93">
-<link rel="icon" href="shirley-logo.png?v=93">
-<meta http-equiv="refresh" content="0;url=index.html?view=1&share=1&v=93">
-<script>location.replace('index.html?view=1&share=1&v=93');</script>
-</head>
-<body></body>
-</html>
-''',encoding='utf-8')
-
-          q=Path('sw.js')
-          w=q.read_text(encoding='utf-8')
-          w=re.sub(r"const CACHE='shirli-v\d+';","const CACHE='shirli-v69';",w)
-          q.write_text(w,encoding='utf-8')
           PY
       - run: git config user.name github-actions
       - run: git config user.email github-actions@github.com
-      - run: git add index.html view.html sw.js && git commit -m 'Open shared link in Shirley read-only collection v93' && git push
+      - run: git add sw.js && git commit -m 'Compact home header so bottom tiles remain visible' && git push
