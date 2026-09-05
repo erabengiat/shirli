@@ -643,6 +643,8 @@ if ('serviceWorker' in navigator) {
 #home .home-actions-grid-v80 .tile-label{font-size:13px!important;color:#244F5E!important;font-weight:700!important;opacity:1!important}
 @media(max-height:700px){#home .topbar{min-height:78px!important}#home .home-logo{width:52px!important;height:52px!important;min-width:52px!important;min-height:52px!important}#home .home-actions-grid-v80{gap:3px 18px!important;padding-bottom:5px!important}#home .home-actions-grid-v80 .disc{width:52px!important;height:52px!important;min-width:52px!important;min-height:52px!important}#home .home-actions-grid-v80 .disc svg{width:28px!important;height:28px!important}}
 </style>
+
+<style id="shirli-v86-css">#help button[onclick*="exportBackup"],#help button[onclick*="restoreFile"],#help button[onclick*="toggleEditingAllowed"],#help #publishWrap,#help #restoreFile{display:none!important}#home .topbar{min-height:106px!important;padding-top:12px!important}#home .home-logo{width:72px!important;height:72px!important;min-width:72px!important;min-height:72px!important;margin-top:5px!important}#home .home-title-v80{font-size:17px!important;margin-top:3px!important}#home .home-actions-grid-v80 .disc{width:58px!important;height:58px!important;min-width:58px!important;min-height:58px!important}#home .home-actions-grid-v80 .disc svg{width:30px!important;height:30px!important}#home .home-actions-grid-v80 .tile:nth-child(1) .disc{background:#c95f3c!important}#home .home-actions-grid-v80 .tile:nth-child(2) .disc{background:#244f5e!important}#home .home-actions-grid-v80 .tile:nth-child(3) .disc{background:#d9a441!important}#home .home-actions-grid-v80 .tile:nth-child(4) .disc{background:#4a7c8c!important}#home .home-actions-grid-v80 .tile:nth-child(5) .disc{background:#c98a3b!important}#home .home-actions-grid-v80 .tile:nth-child(6) .disc{background:#6e5a8a!important}#home .home-actions-grid-v80 .tile:nth-child(7) .disc{background:#3e6e5e!important}#home .home-actions-grid-v80 .tile:nth-child(8) .disc{background:#a84b6b!important}</style>
 </head>
 <body>
 <div id="bootLoader">
@@ -925,7 +927,7 @@ if ('serviceWorker' in navigator) {
 let DATA = {books:[], cards:[]};
 let RAW_DATA = null;   // data.json exactly as fetched, before anything is layered on it
 
-const APP_VERSION = 'v83';
+const APP_VERSION = 'v86';
 const BOOK_COLORS=['#C0673B','#244F5E','#D9A441','#8A5A44','#3E6E5E','#B0443B','#6E5A8A','#4A7C8C','#C98A3B','#5E7A44','#A84B6B','#3B5468','#7A6A4F'];
 function bookColor(id){ return BOOK_COLORS[(id-1) % BOOK_COLORS.length]; }
 let books=[];
@@ -2116,11 +2118,13 @@ function restoreCustomBooks(){
 function openHelp(){
   const n = books.reduce((s,b)=>s+b.cards.length,0);
   const withNotes = books.reduce((s,b)=>s+b.cards.filter(c=>c.note).length,0);
+  let bookCount=books.length;
+  try{const saved=JSON.parse(localStorage.getItem(BOOKS_KEY)||'[]');const ids=new Set(books.map(b=>String(b.id)));saved.forEach(b=>ids.add(String(b.id)));bookCount=ids.size;}catch(e){}
   document.getElementById('aboutBox').textContent =
     'האוסף של שירלי\n' +
     'סה"כ דפים: ' + n + '\n' +
     'דפים עם הערה: ' + withNotes + '\n' +
-    'ספרים: ' + books.length + '\n' +
+    'ספרים: ' + bookCount + '\n' +
     'גרסה: ' + APP_VERSION;
   document.getElementById('guideBox').style.display='none';
   const vb=document.getElementById('viewerLinkBox'); if(vb) vb.textContent=viewerURL();
@@ -2161,10 +2165,8 @@ const GUIDE_SHORT = [
   ['books','הספרים','כל הספרים. בתוך ספר — קודם הדפים לאורך, ואז קבוצה נפרדת של דפים לרוחב.'],
   ['card','לראות דף','לחיצה אחת פותחת דף. לחיצה כפולה על התמונה מגדילה למסך מלא.'],
   ['edit','לערוך דף','פתחו דף ← האייקון שליד השם ← שנו ← שמירה.'],
-  ['four','קריאת 4 דפים','כתבו שאלה או הכתיבו בקול ← שליפה ← לחיצה על דף מציגה את ההערה ← שמירת הקריאה.'],
   ['add','הוספת דף','בחרו מקור (מצלמה / גלריה / קבצים), שם, ספר, סדרה והערה.'],
   ['search','חיפוש דף','לפי מילת מפתח, לפי שם, או "נוסף לאחרונה". אפשר לסנן לפי ספר וסדרה.'],
-  ['draw','שליפת דף','שולף דף אקראי אחד מכל האוסף.'],
   ['settings','הגדרות','יצירת ספר חדש, ביטול הפעולה האחרונה, לוג פעילות וזמן שימוש.'],
   ['home','כפתור הבית','העיגול הקטן בפינה מחזיר תמיד למסך הבית.']
 ];
