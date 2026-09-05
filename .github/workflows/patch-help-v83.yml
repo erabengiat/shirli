@@ -1,0 +1,33 @@
+name: Patch Shirley help v83
+on:
+  push:
+    paths: ['.github/workflows/patch-help-v83.yml']
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          p=Path('index.html'); s=p.read_text()
+          s=s.replace('עזרה וגיבוי','עזרה ושיתוף')
+          a=s.find('<div class="detail-section-label" style="margin-top:22px">גיבוי</div>')
+          b=s.find('<div class="detail-section-label" style="margin-top:22px">שיתוף לצפייה בלבד</div>',a)
+          if a<0 or b<0: raise SystemExit('help block not found')
+          s=s[:a]+s[b:]
+          s=s.replace('הקישור הזה מאפשר לחברים לצפות באוסף של עירא — בלי אפשרות לערוך, להוסיף או לשנות.','הקישור הזה מאפשר לחברים לצפות באוסף של שירלי — בלי אפשרות לערוך, להוסיף או לשנות.')
+          s=s.replace("'סול קולאז\\' של עירא\\n' +","'האוסף של שירלי\\n' +")
+          s=s.replace("'ספרים: ' + books.filter(b=>b.cards.length).length + '\\n' +","'ספרים: ' + books.length + '\\n' +")
+          s=s.replace("const APP_VERSION = 'v82';","const APP_VERSION = 'v83';")
+          p.write_text(s)
+          q=Path('sw.js'); w=q.read_text(); w=re.sub(r"const CACHE='shirli-v\d+';","const CACHE='shirli-v58';",w); q.write_text(w)
+          PY
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add index.html sw.js
+          git commit -m 'Update help and sharing v83'
+          git push
