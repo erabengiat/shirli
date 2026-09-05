@@ -1,5 +1,5 @@
 /* Shirley app service worker */
-const CACHE='shirli-v57';
+const CACHE='shirli-v58';
 self.addEventListener('install',e=>self.skipWaiting());
 self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(xs=>Promise.all(xs.filter(x=>x!==CACHE).map(x=>caches.delete(x)))).then(()=>self.clients.claim())));
 
