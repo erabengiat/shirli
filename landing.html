@@ -23,7 +23,7 @@ h1{font-family:Georgia,serif;font-weight:400;font-size:clamp(30px,9vw,42px);line
 <body>
 <div class="wrap" id="wrap">
   <div class="brand">
-    <img class="logo" src="shirley-logo.jpg" alt="הלוגו של שירלי רגב">
+    <img class="logo" src="shirley-logo.png?v=53" alt="הלוגו של שירלי רגב">
     <h1>Shirley Regev</h1>
     <div class="he">שירלי רגב</div>
     <div class="tag">בשפת הטבע<br>ליווי בחיבור לטבע הפנימי והחיצוני</div>
@@ -40,7 +40,7 @@ h1{font-family:Georgia,serif;font-weight:400;font-size:clamp(30px,9vw,42px);line
 <script>
 if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{});}
 let timer=setTimeout(go,3000);
-function go(){ location.href='index.html?v=51&fromLanding=1'; }
+function go(){ location.href='index.html?v=53&fromLanding=1'; }
 function hold(e){ e.stopPropagation(); clearTimeout(timer); }
 document.getElementById('wrap').addEventListener('click',function(e){ if(!e.target.closest('a')) go(); });
 </script>
