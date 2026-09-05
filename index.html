@@ -46,7 +46,7 @@
   .screen.active{display:flex;}
   @keyframes fade{from{opacity:0;}to{opacity:1;}}
   .brand{display:flex;align-items:center;justify-content:center;gap:10px;}
-  .brand-mark{width:40px;height:40px;border-radius:50%;background:url('logo.png') center/cover no-repeat;box-shadow:0 2px 8px var(--card-shadow);flex:0 0 auto;}
+  .brand-mark{width:40px;height:40px;border-radius:50%;background:url('shirley-logo.png') center/cover no-repeat;box-shadow:0 2px 8px var(--card-shadow);flex:0 0 auto;}
   .brand-name{display:flex;flex-direction:column;line-height:1.05;align-items:center;text-align:center;}
   .brand-name .he{font-family:'Varela Round',sans-serif;font-size:19px;letter-spacing:0;color:var(--teal);}
   .brand-name .en{font-family:'Varela Round',sans-serif;font-size:12px;letter-spacing:.05em;color:var(--clay);margin-top:2px;}
@@ -79,7 +79,7 @@
   .bottom-row .tile:nth-child(2) .disc{--key-base:#A84B6B;--key-hi:#C77190;--key-lo:#853A53;--key-edge:#642A3E;}
   #cover{align-items:center;justify-content:center;min-height:100vh;padding:0;}
   .cover-wrap{display:flex;flex-direction:column;align-items:center;text-align:center;justify-content:space-between;padding:clamp(14px,3vh,26px) 18px clamp(16px,3.4vh,30px);max-width:430px;margin:auto;width:100%;min-height:100vh;}
-  .cover-mark{width:clamp(96px,22vh,150px);height:clamp(96px,22vh,150px);border-radius:50%;margin-bottom:0;background:url('logo.png') center/cover no-repeat;box-shadow:0 5px 16px var(--card-shadow);flex:0 0 auto;}
+  .cover-mark{width:clamp(96px,22vh,150px);height:clamp(96px,22vh,150px);border-radius:50%;margin-bottom:0;background:url('shirley-logo.png') center/cover no-repeat;box-shadow:0 5px 16px var(--card-shadow);flex:0 0 auto;}
   .cover-title{font-family:'Varela Round',sans-serif;font-size:clamp(20px,5vh,27px);line-height:1.18;color:var(--teal);margin:0;}
   .cover-title span{color:var(--clay);font-size:clamp(14px,3.4vh,18px);}
   .cover-thanks{width:100%;background:rgba(255,255,255,.55);border:1px solid rgba(36,79,94,.18);border-radius:14px;padding:clamp(12px,2.2vh,20px) clamp(12px,4vw,18px);text-align:center;}
@@ -367,7 +367,7 @@
   .home-logo{
     width:clamp(96px,16vh,140px);height:clamp(96px,16vh,140px);
     border-radius:50%;margin:0 auto;
-    background:url('logo.png') center/cover no-repeat;
+    background:url('shirley-logo.png') center/cover no-repeat;
     box-shadow:0 4px 14px var(--card-shadow);
   }
 
@@ -762,7 +762,6 @@ if ('serviceWorker' in navigator) {
       </div>
       <div class="field"><label>טקסט לחיפוש</label><input type="text" id="searchName" placeholder="הקלידו מילה..." oninput="runSearch()"></div>
       <div class="field"><label>לפי ספר</label><select id="searchBook" onchange="runSearch()"><option value="">כל הספרים</option></select></div>
-      <div class="field"><label>לפי סדרה (Suit)</label><select id="searchSuit" onchange="runSearch()"><option value="">כל הסדרות</option></select></div>
       <div class="sub-count" id="searchCount" style="margin:4px 2px 10px;"></div>
       <div id="searchGrid"></div>
     </div>
@@ -891,7 +890,7 @@ if ('serviceWorker' in navigator) {
 let DATA = {books:[], cards:[]};
 let RAW_DATA = null;   // data.json exactly as fetched, before anything is layered on it
 
-const APP_VERSION = 'v76';
+const APP_VERSION = 'v77';
 const BOOK_COLORS=['#C0673B','#244F5E','#D9A441','#8A5A44','#3E6E5E','#B0443B','#6E5A8A','#4A7C8C','#C98A3B','#5E7A44','#A84B6B','#3B5468','#7A6A4F'];
 function bookColor(id){ return BOOK_COLORS[(id-1) % BOOK_COLORS.length]; }
 let books=[];
@@ -1561,8 +1560,6 @@ function openThumbs(){
 function openSearch(){
   const sb=document.getElementById('searchBook');
   if(sb.options.length<=1){ books.forEach(b=>{ if(b.cards.length){ const o=document.createElement('option'); o.value=b.id; o.textContent=b.name; sb.appendChild(o);} }); }
-  const ss=document.getElementById('searchSuit');
-  if(ss.options.length<=1){ SUITS.forEach(s=>{ const o=document.createElement('option'); o.value=s; o.textContent=s; ss.appendChild(o);}); }
   runSearch();
   showScreen('search');
 }
@@ -1581,7 +1578,7 @@ function runSearch(){
   const q=(document.getElementById('searchName').value||'').trim();
   const mode=(document.getElementById('searchMode')||{value:'key'}).value;
   const book=document.getElementById('searchBook').value;
-  const suit=document.getElementById('searchSuit').value;
+  const suit='';
   let all=allCardsWithImg();
 
   if(mode==='recent'){
@@ -1597,7 +1594,6 @@ function runSearch(){
     else all=all.filter(c=>((c.name||'')+' '+(c.note||'')).indexOf(q)!==-1);
   }
   if(book) all=all.filter(c=>String(c.bookId)===String(book));
-  if(suit) all=all.filter(c=>c.suit===suit);
 
   document.getElementById('searchCount').textContent=all.length+' תוצאות';
   const g=document.getElementById('searchGrid'); g.innerHTML=''; forceGrid(g);

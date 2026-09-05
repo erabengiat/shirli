@@ -1,5 +1,5 @@
 /* Shirley app service worker */
-const CACHE='shirli-v51';
+const CACHE='shirli-v52';
 self.addEventListener('install',e=>self.skipWaiting());
 self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(xs=>Promise.all(xs.filter(x=>x!==CACHE).map(x=>caches.delete(x)))).then(()=>self.clients.claim())));
 
@@ -8,17 +8,17 @@ function isHtml(res){return !!res && (res.headers.get('content-type')||'').inclu
 function cleanHtml(res){
   if(!res.ok||!isHtml(res)) return Promise.resolve(res);
   return res.text().then(html=>{
-    const css=`<style id="shirli-v50-css">
+    const css=`<style id="shirli-v52-css">
       .g-read{display:none!important}
 
       /* Never show the incorrect generated Shirley logo. */
-      .home-logo,.brand-mark,.cover-mark{background-image:none!important;box-shadow:none!important}
+      .brand-mark,.cover-mark{background-image:url('shirley-logo.png')!important;background-size:cover!important;background-position:center!important}
       #home .home-logo{display:none!important}
 
       /* The thank-you / entry screen must fit a phone without scrolling. */
       #cover.active{height:100dvh!important;min-height:100dvh!important;max-height:100dvh!important;overflow:hidden!important}
       #cover .cover-wrap{height:100%!important;min-height:0!important;max-height:100%!important;padding:14px 16px!important;justify-content:space-evenly!important;gap:6px!important;overflow:hidden!important}
-      #cover .cover-mark{display:none!important}
+      #cover .cover-mark{display:block!important}
       #cover .cover-title{font-size:clamp(20px,4.5vh,26px)!important;line-height:1.12!important;margin:0!important}
       #cover .cover-title span{font-size:clamp(15px,3.2vh,18px)!important}
       #cover .cover-thanks{padding:10px 12px!important;margin:0!important}
@@ -62,7 +62,7 @@ function cleanHtml(res){
       #products .product-info{text-align:center;padding:8px}.product-name{font-weight:700;color:#244F5E}.product-price{color:#C0673B;font-weight:700;margin-top:3px}.product-cat{font-size:11px;opacity:.7;margin-top:2px}
       #productAdmin{margin-top:20px;border-top:1px solid rgba(36,79,94,.18);padding-top:16px}
     </style>`;
-    if(!html.includes('shirli-v50-css')) html=html.replace('</head>',css+'\n</head>');
+    if(!html.includes('shirli-v52-css')) html=html.replace('</head>',css+'\n</head>');
 
     /* Music: calm Chopin nocturne, slow fade to 45%. */
     html=html.replace("const MUSIC_SRC='music/beloved.mp3';","const MUSIC_SRC='https://commons.wikimedia.org/wiki/Special:Redirect/file/Nocturne_Op._9_no._2_in_E_flat_major.mp3';");
