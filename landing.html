@@ -33,8 +33,9 @@ h1{font-family:Georgia,serif;font-weight:400;font-size:clamp(32px,10vw,44px);lin
   <div class="continue">נוגעים במסך כדי להמשיך · מעבר אוטומטי בעוד 3 שניות</div>
 </div>
 <script>
+if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{});}
 let timer=setTimeout(go,3000);
-function go(){ location.href='index.html?v=47&fromLanding=1'; }
+function go(){ location.href='index.html?v=48&fromLanding=1'; }
 function hold(e){ e.stopPropagation(); clearTimeout(timer); }
 document.getElementById('wrap').addEventListener('click',function(e){ if(!e.target.closest('a')) go(); });
 </script>
