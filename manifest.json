@@ -3,7 +3,7 @@
   "name": "האוסף של שירלי",
   "short_name": "האוסף של שירלי",
   "description": "הספרים, העבודות והמוצרים של שירלי",
-  "start_url": "/shirli/",
+  "start_url": "/shirli/landing.html",
   "scope": "/shirli/",
   "display": "standalone",
   "orientation": "portrait",
