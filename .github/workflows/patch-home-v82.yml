@@ -1,0 +1,31 @@
+name: Patch Shirley home v82
+on:
+  push:
+    paths: ['.github/workflows/patch-home-v82.yml']
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch home
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('index.html'); s=p.read_text()
+          # remove draw tile from source
+          import re
+          s=re.sub(r'\s*<button class="tile small" onclick="drawOne\(\)">.*?<span class="tile-label">שליפת דף</span></button>', '', s, flags=re.S)
+          # tighten home top and grid; force visible icon treatment
+          css='''\n<style id="shirli-home-v82-css">\n/* HOME V82: no draw tile, compact symmetric grid, readable icons */\n#home .topbar{min-height:88px!important;padding:4px 16px 2px!important;gap:2px!important}\n#home .home-logo{width:58px!important;height:58px!important;min-width:58px!important;min-height:58px!important;background:url('shirley-logo.png?v=82') center/cover no-repeat!important}\n#home .home-title-v80{font-size:16px!important}\n#home .home-actions-grid-v80{grid-template-columns:repeat(2,minmax(0,1fr))!important;grid-template-rows:repeat(4,minmax(0,1fr))!important;gap:6px 18px!important;padding:2px 24px 10px!important}\n#home .home-actions-grid-v80 .tile{background:transparent!important;box-shadow:none!important;border:0!important;display:flex!important;flex-direction:column!important;justify-content:center!important;align-items:center!important;gap:5px!important}\n#home .home-actions-grid-v80 .disc{width:58px!important;height:58px!important;min-width:58px!important;min-height:58px!important;border-radius:16px!important;background:linear-gradient(180deg,#32677a,#163e50)!important;box-shadow:0 5px 10px rgba(36,79,94,.22)!important;opacity:1!important}\n#home .home-actions-grid-v80 .disc svg{width:31px!important;height:31px!important;display:block!important;opacity:1!important;stroke:#F3EAD8!important}\n#home .home-actions-grid-v80 .disc svg *{stroke:#F3EAD8!important;opacity:1!important}\n#home .home-actions-grid-v80 .tile-label{font-size:13px!important;color:#244F5E!important;font-weight:700!important;opacity:1!important}\n@media(max-height:700px){#home .topbar{min-height:78px!important}#home .home-logo{width:52px!important;height:52px!important;min-width:52px!important;min-height:52px!important}#home .home-actions-grid-v80{gap:3px 18px!important;padding-bottom:5px!important}#home .home-actions-grid-v80 .disc{width:52px!important;height:52px!important;min-width:52px!important;min-height:52px!important}#home .home-actions-grid-v80 .disc svg{width:28px!important;height:28px!important}}\n</style>\n'''
+          s=s.replace('</head>',css+'</head>')
+          s=s.replace("const APP_VERSION = 'v81';","const APP_VERSION = 'v82';")
+          p.write_text(s)
+          sw=Path('sw.js'); w=sw.read_text(); w=re.sub(r"const CACHE='shirli-v\d+';", "const CACHE='shirli-v57';", w); sw.write_text(w)
+          PY
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add index.html sw.js
+          git commit -m 'Clean home layout and restore icons v82'
+          git push
