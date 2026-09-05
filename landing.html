@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>האוסף של שירלי</title>
+<style>
+html,body{margin:0;height:100%;background:#f5efe3;font-family:Arial,sans-serif;overflow:hidden}
+.wrap{position:relative;height:100dvh;max-width:430px;margin:0 auto;background:#f5efe3;overflow:hidden;cursor:pointer}
+.hero{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.hot{position:absolute;z-index:3;border-radius:18px;text-decoration:none;-webkit-tap-highlight-color:transparent}
+.phone{left:4.5%;top:60.0%;width:45%;height:8.6%}
+.mail{right:4.5%;top:60.0%;width:45%;height:8.6%}
+.insta{left:4.5%;top:70.0%;width:45%;height:8.6%}
+.fb{right:4.5%;top:70.0%;width:45%;height:8.6%}
+.hint{position:absolute;left:0;right:0;bottom:2.3%;z-index:4;text-align:center;color:#174d39;font-size:13px;opacity:.82;pointer-events:none}
+</style>
+</head>
+<body>
+<div class="wrap" id="wrap" aria-label="דף פתיחה של שירלי">
+<img class="hero" alt="Shirley Regev" src="data:image/jpeg;base64,PLACEHOLDER_BASE64">
+<a class="hot phone" href="tel:+972523317195" aria-label="התקשרו לשירלי" onclick="stop(event)"></a>
+<a class="hot mail" href="mailto:shirley.regev@gmail.com" aria-label="שלחו מייל לשירלי" onclick="stop(event)"></a>
+<a class="hot insta" href="https://www.instagram.com/shirley.regev/" target="_blank" rel="noopener" aria-label="האינסטגרם של שירלי" onclick="stop(event)"></a>
+<a class="hot fb" href="https://www.facebook.com/regev.shirley" target="_blank" rel="noopener" aria-label="הפייסבוק של שירלי" onclick="stop(event)"></a>
+<div class="hint">נוגעים במסך כדי להמשיך</div>
+</div>
+<script>
+let timer=setTimeout(go,3000);
+function go(){ location.href='index.html?fromLanding=1'; }
+function stop(e){ e.stopPropagation(); clearTimeout(timer); }
+document.getElementById('wrap').addEventListener('click',function(e){ if(!e.target.closest('.hot')) go(); });
+</script>
+</body>
+</html>
