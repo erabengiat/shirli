@@ -1,0 +1,46 @@
+name: Patch Shirley home v80
+on:
+  push:
+    paths:
+      - '.github/workflows/patch-home-v80.yml'
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch entry and home
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+
+          s=s.replace('<h1 class="cover-title">האוסף של<br><span>שירלי</span></h1>','<h1 class="cover-title">האוסף של שירלי</h1>')
+          s=s.replace("const APP_VERSION = 'v79';","const APP_VERSION = 'v80';")
+
+          marker='/* SHIRLI HOME GRID V80 */'
+          css='''\n<style>\n/* SHIRLI HOME GRID V80 */\n#cover{position:relative}\n#cover .cover-title{font-family:'Varela Round',sans-serif!important;font-size:24px!important;line-height:1.15!important;color:#244F5E!important;white-space:nowrap!important;margin:0!important}\n#cover .cover-back{position:absolute;top:12px;inset-inline-start:12px;width:38px;height:38px;border:0;background:rgba(255,255,255,.55);border-radius:50%;font-size:24px;color:#244F5E;z-index:5;cursor:pointer}\n#home.active{height:100dvh!important;min-height:100dvh!important;max-height:100dvh!important;overflow:hidden!important;display:flex!important;flex-direction:column!important}\n#home .topbar{position:relative!important;min-height:108px!important;padding:6px 16px 4px!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:3px!important}\n#home .home-logo{width:68px!important;height:68px!important;min-width:68px!important;min-height:68px!important;border-radius:50%!important;background:url('shirley-logo.png?v=80') center/cover no-repeat!important;margin:0 auto!important}\n#home .home-title-v80{font-family:'Varela Round',sans-serif;font-size:17px;font-weight:700;color:#244F5E;line-height:1.1;text-align:center}\n#home .home-back-v80{position:absolute;top:10px;inset-inline-start:10px;width:36px;height:36px;border:0;background:rgba(255,255,255,.55);border-radius:50%;font-size:22px;color:#244F5E;cursor:pointer;z-index:4}\n#home .group,#home .bottom-row{display:none!important}\n#home .home-actions-grid-v80{flex:1 1 auto;min-height:0;width:100%;display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;grid-template-rows:repeat(4,minmax(0,1fr))!important;gap:8px 14px!important;padding:6px 16px 12px!important;align-items:stretch!important}\n#home .home-actions-grid-v80 .tile{display:flex!important;width:100%!important;min-width:0!important;min-height:0!important;height:100%!important;padding:2px!important;align-items:center!important;justify-content:center!important;gap:4px!important}\n#home .home-actions-grid-v80 .disc{width:50px!important;height:50px!important;min-width:50px!important;min-height:50px!important;border-radius:14px!important}\n#home .home-actions-grid-v80 .tile-label{font-size:12px!important;line-height:1.08!important;min-height:22px!important}\n#home button,#home a{touch-action:manipulation}\n@media(max-height:700px){#home .topbar{min-height:92px!important}#home .home-logo{width:58px!important;height:58px!important;min-width:58px!important;min-height:58px!important}#home .home-title-v80{font-size:15px}#home .home-actions-grid-v80{gap:5px 12px!important;padding-top:3px!important;padding-bottom:7px!important}#home .home-actions-grid-v80 .disc{width:44px!important;height:44px!important;min-width:44px!important;min-height:44px!important}#home .home-actions-grid-v80 .tile-label{font-size:11px!important}}\n</style>\n'''
+          if marker not in s:
+              s=s.replace('</head>',css+'\n</head>',1)
+
+          script_marker='SHIRLI_HOME_V80_SCRIPT'
+          script=r'''\n<script id="shirli-home-v80">\n/* SHIRLI_HOME_V80_SCRIPT */\n(function(){\n  function makeShareTile(){\n    const b=document.createElement('button');\n    b.className='tile small';\n    b.type='button';\n    b.innerHTML='<span class="disc"><svg viewBox="0 0 24 24" fill="none" stroke="#F3EAD8" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/><line x1="8.3" y1="10.9" x2="15.7" y2="6.1"/><line x1="8.3" y1="13.1" x2="15.7" y2="17.9"/></svg></span><span class="tile-label">שיתוף</span>';\n    b.onclick=async()=>{\n      const url=(typeof viewerURL==='function')?viewerURL():(location.origin+'/shirli/view.html');\n      try{\n        if(navigator.share){await navigator.share({title:'האוסף של שירלי',text:'האוסף של שירלי',url});}\n        else if(navigator.clipboard){await navigator.clipboard.writeText(url); if(typeof tap==='function')tap('הקישור הועתק');}\n        else{prompt('קישור לשיתוף',url);}\n      }catch(e){}\n    };\n    return b;\n  }\n  function arrange(){\n    const h=document.getElementById('home'); if(!h)return;\n    const top=h.querySelector('.topbar');\n    if(top){\n      if(!top.querySelector('.home-title-v80')){const t=document.createElement('div');t.className='home-title-v80';t.textContent='האוסף של שירלי';top.appendChild(t);}\n      if(!top.querySelector('.home-back-v80')){const b=document.createElement('button');b.className='home-back-v80';b.type='button';b.textContent='‹';b.setAttribute('aria-label','חזרה למסך התודות');b.onclick=()=>showScreen('cover');top.appendChild(b);}\n    }\n    document.querySelectorAll('#home button,#home a').forEach(el=>{const tx=(el.textContent||'').trim();if(tx==='בית')el.style.display='none';});\n    let grid=h.querySelector('.home-actions-grid-v80');\n    if(!grid){grid=document.createElement('div');grid.className='home-actions-grid-v80';h.appendChild(grid);}\n    const buttons=[...h.querySelectorAll('.tile')];\n    const byLabel={};\n    for(const b of buttons){const l=b.querySelector('.tile-label');if(!l)continue;let x=l.textContent.trim();if(x==='מצגת הדפים')x='מצגת העבודות';if(x==='חיפוש דף')x='חיפוש';if(x==='שליפת דף'||x==='בית')continue;byLabel[x]=b;}\n    if(!byLabel['שיתוף'])byLabel['שיתוף']=makeShareTile();\n    const order=['מצגת העבודות','הספרים','מוצרים','הוספת דף','חיפוש','שיתוף','הגדרות','עזרה וגיבוי'];\n    grid.innerHTML='';\n    for(const label of order){const b=byLabel[label];if(b){b.style.display='flex';grid.appendChild(b);}}\n  }\n  function coverBack(){\n    const c=document.getElementById('cover');if(!c)return;\n    if(!c.querySelector('.cover-back')){const b=document.createElement('button');b.className='cover-back';b.type='button';b.textContent='‹';b.setAttribute('aria-label','חזרה למסך שירלי רגב');b.onclick=()=>{location.href='landing.html?v=80'};c.appendChild(b);}\n  }\n  document.addEventListener('DOMContentLoaded',()=>{coverBack();setTimeout(arrange,700);setTimeout(arrange,1200)});\n  window.addEventListener('load',()=>{coverBack();setTimeout(arrange,900)});\n})();\n</script>\n'''
+          if script_marker not in s:
+              s=s.replace('</body>',script+'\n</body>',1)
+          p.write_text(s,encoding='utf-8')
+
+          q=Path('sw.js')
+          w=q.read_text(encoding='utf-8')
+          w=w.replace("const CACHE='shirli-v54';","const CACHE='shirli-v55';")
+          q.write_text(w,encoding='utf-8')
+          PY
+      - name: Commit patch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html sw.js
+          git diff --cached --quiet && exit 0
+          git commit -m "Refine Shirley entry and home navigation"
+          git push
