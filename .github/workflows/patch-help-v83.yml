@@ -1,4 +1,4 @@
-name: Patch Shirley v88
+name: Patch Shirley v89
 on:
   push:
     paths: ['.github/workflows/patch-help-v83.yml']
@@ -13,28 +13,32 @@ jobs:
           python - <<'PY'
           from pathlib import Path
           import re
+
           p=Path('index.html')
           s=p.read_text(encoding='utf-8')
-          old='<div class="subhead"><h2>מצגת הדפים</h2></div>'
-          new='<div class="subhead"><button class="back" type="button" onclick="showScreen(\'home\')" aria-label="חזרה"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg></button><h2>מצגת הדפים</h2></div>'
-          if old not in s:
-              raise SystemExit('slide menu header not found')
-          s=s.replace(old,new,1)
-          s=s.replace("const APP_VERSION = 'v87';","const APP_VERSION = 'v88';")
+          s=s.replace("const APP_VERSION = 'v88';","const APP_VERSION = 'v89';")
           p.write_text(s,encoding='utf-8')
 
           q=Path('sw.js')
           w=q.read_text(encoding='utf-8')
-          w=re.sub(r"const CACHE='shirli-v\d+';","const CACHE='shirli-v63';",w)
+          needle="      /* Products */\n"
+          css="""      /* Products */
+      #products .subhead{position:relative!important}
+      #products .back{position:absolute!important;inset-inline-start:12px!important;top:50%!important;transform:translateY(-50%)!important;width:48px!important;height:48px!important;min-width:48px!important;min-height:48px!important;border-radius:50%!important;background:rgba(255,255,255,.92)!important;color:#244F5E!important;font-size:34px!important;font-weight:700!important;line-height:44px!important;display:flex!important;align-items:center!important;justify-content:center!important;z-index:5!important;box-shadow:0 3px 10px rgba(36,79,94,.18)!important}
+"""
+          if '#products .back{' not in w:
+              if needle not in w: raise SystemExit('products css marker not found')
+              w=w.replace(needle,css,1)
+          w=re.sub(r"const CACHE='shirli-v\d+';","const CACHE='shirli-v64';",w)
           q.write_text(w,encoding='utf-8')
 
           l=Path('landing.html')
           x=l.read_text(encoding='utf-8')
-          x=re.sub(r'v=\d+','v=88',x)
+          x=re.sub(r'v=\d+','v=89',x)
           l.write_text(x,encoding='utf-8')
           PY
           git config user.name github-actions
           git config user.email github-actions@github.com
           git add index.html sw.js landing.html
-          git commit -m 'Fix slideshow menu back button v88'
+          git commit -m 'Enlarge products back arrow v89'
           git push
