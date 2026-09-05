@@ -1,0 +1,67 @@
+name: Patch Products Examples v91
+on:
+  push:
+    paths:
+      - '.github/workflows/patch-products-examples-v91.yml'
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch product examples
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          q=Path('sw.js')
+          w=q.read_text(encoding='utf-8')
+          if 'shirli-product-examples-v91' not in w:
+              inject=r'''
+    const productExamples=`<script id="shirli-product-examples-v91">(function(){
+      function ensureFolder(){
+        let s=document.getElementById('productFolder');
+        if(s)return s;
+        s=document.createElement('div');s.id='productFolder';s.className='screen';
+        s.innerHTML='<div class="subhead"><button class="back" type="button" onclick="showScreen(\\'products\\')">‹</button><h2 id="productFolderTitle">מוצרים</h2></div><div class="products-grid" id="productFolderGrid"></div>';
+        document.querySelector('.app')?.appendChild(s);
+        return s;
+      }
+      function openFolder(name){
+        ensureFolder();
+        const t=document.getElementById('productFolderTitle'),g=document.getElementById('productFolderGrid');
+        t.textContent=name;
+        if(name==='תמונות'){
+          g.innerHTML='<div class="product-card" id="portraitLink"><div class="product-img"><img src="/shirli/images/30.jpg"></div><div class="product-info"><div class="product-name">דיוקנאות</div><div class="product-cat">מעבר לספר הדיוקנאות</div></div></div>';
+          document.getElementById('portraitLink').onclick=function(){ if(typeof openBook==='function')openBook(9); };
+        }else if(name==='מדבקות'){
+          const a=[['חמור',1],['קרנף',141],['זברה',157]];
+          g.innerHTML=a.map(x=>'<div class="product-card"><div class="product-img"><img src="/shirli/images/'+x[1]+'.jpg"></div><div class="product-info"><div class="product-name">'+x[0]+'</div><div class="product-cat">דוגמה למדבקה</div></div></div>').join('');
+        }
+        showScreen('productFolder');
+      }
+      document.addEventListener('click',function(e){
+        const card=e.target.closest&&e.target.closest('#products .product-card');if(!card)return;
+        const n=(card.querySelector('.product-name')?.textContent||'').trim();
+        if(n==='תמונות'||n==='מדבקות'){e.preventDefault();openFolder(n);}
+      },true);
+      const st=document.createElement('style');
+      st.textContent='#productFolder .products-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px 14px 24px}#productFolder .product-card{background:rgba(255,255,255,.55);border:1px solid rgba(36,79,94,.14);border-radius:14px;overflow:hidden;box-shadow:0 3px 10px rgba(42,58,71,.11)}#productFolder .product-img{height:170px;background:#eadfc9;display:flex;align-items:center;justify-content:center;overflow:hidden}#productFolder .product-img img{width:100%;height:100%;object-fit:contain;background:#fff}#productFolder .product-info{text-align:center;padding:8px}#productFolder .product-name{font-weight:700;color:#244F5E}#productFolder .product-cat{font-size:11px;opacity:.7;margin-top:2px}#productFolder .back{width:48px!important;height:48px!important;font-size:34px!important;display:flex!important;align-items:center!important;justify-content:center!important}';
+      document.head.appendChild(st);
+    })();</script>`;
+    if(!html.includes('shirli-product-examples-v91')) html=html.replace('</body>',productExamples+'\n</body>');
+'''
+              marker='    const headers=new Headers(res.headers);'
+              if marker not in w: raise SystemExit('headers marker not found')
+              w=w.replace(marker,inject+'\n'+marker,1)
+          w=re.sub(r"const CACHE='shirli-v\d+';","const CACHE='shirli-v66';",w)
+          q.write_text(w,encoding='utf-8')
+          PY
+      - name: Commit
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add sw.js
+          git commit -m 'Add product examples v91'
+          git push
