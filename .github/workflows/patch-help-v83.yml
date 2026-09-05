@@ -1,4 +1,4 @@
-name: Patch Shirley help v86
+name: Patch Shirley v87
 on:
   push:
     paths: ['.github/workflows/patch-help-v83.yml']
@@ -13,20 +13,62 @@ jobs:
           python - <<'PY'
           from pathlib import Path
           import re
-          p=Path('index.html'); s=p.read_text()
-          s=s.replace("  ['four','קריאת 4 דפים','כתבו שאלה או הכתיבו בקול ← שליפה ← לחיצה על דף מציגה את ההערה ← שמירת הקריאה.'],\n",'')
-          s=s.replace("  ['draw','שליפת דף','שולף דף אקראי אחד מכל האוסף.'],\n",'')
-          s=s.replace("const withNotes = books.reduce((s,b)=>s+b.cards.filter(c=>c.note).length,0);","const withNotes = books.reduce((s,b)=>s+b.cards.filter(c=>c.note).length,0);\n  let bookCount=books.length;\n  try{const saved=JSON.parse(localStorage.getItem(BOOKS_KEY)||'[]');const ids=new Set(books.map(b=>String(b.id)));saved.forEach(b=>ids.add(String(b.id)));bookCount=ids.size;}catch(e){}")
-          s=s.replace("'ספרים: ' + books.length + '\\n' +","'ספרים: ' + bookCount + '\\n' +")
-          css='\n<style id="shirli-v86-css">#help button[onclick*="exportBackup"],#help button[onclick*="restoreFile"],#help button[onclick*="toggleEditingAllowed"],#help #publishWrap,#help #restoreFile{display:none!important}#home .topbar{min-height:106px!important;padding-top:12px!important}#home .home-logo{width:72px!important;height:72px!important;min-width:72px!important;min-height:72px!important;margin-top:5px!important}#home .home-title-v80{font-size:17px!important;margin-top:3px!important}#home .home-actions-grid-v80 .disc{width:58px!important;height:58px!important;min-width:58px!important;min-height:58px!important}#home .home-actions-grid-v80 .disc svg{width:30px!important;height:30px!important}#home .home-actions-grid-v80 .tile:nth-child(1) .disc{background:#c95f3c!important}#home .home-actions-grid-v80 .tile:nth-child(2) .disc{background:#244f5e!important}#home .home-actions-grid-v80 .tile:nth-child(3) .disc{background:#d9a441!important}#home .home-actions-grid-v80 .tile:nth-child(4) .disc{background:#4a7c8c!important}#home .home-actions-grid-v80 .tile:nth-child(5) .disc{background:#c98a3b!important}#home .home-actions-grid-v80 .tile:nth-child(6) .disc{background:#6e5a8a!important}#home .home-actions-grid-v80 .tile:nth-child(7) .disc{background:#3e6e5e!important}#home .home-actions-grid-v80 .tile:nth-child(8) .disc{background:#a84b6b!important}</style>\n'
-          if 'shirli-v86-css' not in s: s=s.replace('</head>',css+'</head>',1)
-          s=s.replace("const APP_VERSION = 'v83';","const APP_VERSION = 'v86';")
-          p.write_text(s)
-          q=Path('sw.js'); w=q.read_text(); w=re.sub(r"const CACHE='shirli-v\d+';","const CACHE='shirli-v61';",w); q.write_text(w)
-          l=Path('landing.html'); x=l.read_text(); x=re.sub(r'v=\d+','v=86',x); l.write_text(x)
+
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+
+          # Slideshow menu: remove explanatory sentence and center 3 visual choices.
+          old='''      <div class="note-box" style="font-size:14px;margin-bottom:16px">בחרו את סדר הדפים במצגת</div>\n\n      <button class="btn clay" onclick="startSlides('desc')">מהאחרון לראשון</button>\n      <button class="btn secondary" onclick="startSlides('asc')">מהראשון לאחרון</button>\n      <button class="btn secondary" onclick="startSlides('random')">אקראי</button>'''
+          new='''      <div class="slide-order-row">\n        <button class="slide-order-btn" onclick="startSlides('desc')" aria-label="מהאחרון לראשון"><span class="slide-order-icon">←</span><span>מהאחרון<br>לראשון</span></button>\n        <button class="slide-order-btn" onclick="startSlides('asc')" aria-label="מהראשון לאחרון"><span class="slide-order-icon">→</span><span>מהראשון<br>לאחרון</span></button>\n        <button class="slide-order-btn" onclick="startSlides('random')" aria-label="אקראי"><span class="slide-order-icon">⤨</span><span>אקראי</span></button>\n      </div>'''
+          if old not in s:
+              raise SystemExit('slide menu block not found')
+          s=s.replace(old,new,1)
+
+          # Clicking the slideshow opens a dedicated fullscreen zoom view instead of exiting.
+          s=s.replace('<div class="slideshow-body" id="slideBody" onclick="exitSlideshow()"></div>',
+                      '<div class="slideshow-body" id="slideBody" onclick="openSlideZoom()"></div>',1)
+
+          zoom_html='''\n  <div id="slideZoom" aria-hidden="true">\n    <button id="slideZoomBack" type="button" onclick="closeSlideZoom(event)" aria-label="חזרה">‹</button>\n    <div id="slideZoomStage">\n      <img id="slideZoomImg" alt="">\n    </div>\n  </div>\n'''
+          marker='<button id="homeFab"'
+          if 'id="slideZoom"' not in s:
+              pos=s.find(marker)
+              if pos<0: raise SystemExit('homeFab marker not found')
+              s=s[:pos]+zoom_html+s[pos:]
+
+          css='''\n<style id="shirli-v87-css">\n#slideMenu .add-form{display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;min-height:55vh!important}\n#slideMenu .slide-order-row{width:min(92vw,620px);display:flex;justify-content:center;align-items:stretch;gap:12px;margin:auto}\n#slideMenu .slide-order-btn{flex:1 1 0;min-width:0;min-height:116px;border:0;border-radius:20px;background:rgba(255,255,255,.72);box-shadow:0 5px 16px rgba(36,79,94,.14);color:#244F5E;font-family:'Varela Round',sans-serif;font-size:14px;font-weight:700;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;padding:10px 6px;cursor:pointer}\n#slideMenu .slide-order-btn:nth-child(1){background:#f0d5c8}\n#slideMenu .slide-order-btn:nth-child(2){background:#d8e6ea}\n#slideMenu .slide-order-btn:nth-child(3){background:#eadfc0}\n#slideMenu .slide-order-icon{font-size:34px;line-height:1;font-weight:700}\n#slideZoom{position:fixed;inset:0;z-index:99999;background:#050505;display:none;overflow:hidden;touch-action:none}\n#slideZoom.show{display:block}\n#slideZoomStage{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;overflow:hidden;touch-action:none}\n#slideZoomImg{max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;transform-origin:center center;user-select:none;-webkit-user-drag:none;touch-action:none}\n#slideZoomBack{position:absolute;top:16px;inset-inline-start:16px;z-index:2;width:46px;height:46px;border:0;border-radius:50%;background:rgba(255,255,255,.88);color:#244F5E;font-size:34px;line-height:42px;box-shadow:0 3px 12px rgba(0,0,0,.28);cursor:pointer}\n@media(max-width:520px){#slideMenu .slide-order-row{gap:8px;width:94vw}#slideMenu .slide-order-btn{min-height:104px;font-size:12.5px;border-radius:16px}.slide-order-icon{font-size:30px!important}}\n</style>\n'''
+          if 'shirli-v87-css' not in s:
+              s=s.replace('</head>',css+'</head>',1)
+
+          zoom_js='''\n<script id="shirli-v87-js">\n(function(){\n  let zoomScale=1, zoomX=0, zoomY=0;\n  let pinchStartDist=0, pinchStartScale=1, panStartX=0, panStartY=0, panOriginX=0, panOriginY=0;\n  let slideWasPlaying=false;\n  function zimg(){return document.getElementById('slideZoomImg')}\n  function applyZoom(){const im=zimg();if(im)im.style.transform='translate('+zoomX+'px,'+zoomY+'px) scale('+zoomScale+')'}\n  function resetZoom(){zoomScale=1;zoomX=0;zoomY=0;applyZoom()}\n  window.openSlideZoom=function(){\n    const c=(typeof slideOrder!=='undefined'&&slideOrder.length)?slideOrder[slideIdx]:null;\n    const v=document.getElementById('slideZoom'),im=zimg();\n    if(!v||!im||!c)return;\n    slideWasPlaying=!!slidePlaying;\n    if(slideWasPlaying)stopSlideshow();\n    im.src=c.img;resetZoom();v.classList.add('show');v.setAttribute('aria-hidden','false');\n  };\n  window.closeSlideZoom=function(ev){\n    if(ev){ev.preventDefault();ev.stopPropagation()}\n    const v=document.getElementById('slideZoom');if(v){v.classList.remove('show');v.setAttribute('aria-hidden','true')}\n    resetZoom();\n    if(slideWasPlaying&&typeof startSlideshow==='function')startSlideshow();\n  };\n  function dist(t1,t2){const dx=t1.clientX-t2.clientX,dy=t1.clientY-t2.clientY;return Math.hypot(dx,dy)}\n  document.addEventListener('DOMContentLoaded',function(){\n    const stage=document.getElementById('slideZoomStage'),im=zimg();if(!stage||!im)return;\n    stage.addEventListener('dblclick',function(e){window.closeSlideZoom(e)});\n    stage.addEventListener('wheel',function(e){e.preventDefault();zoomScale=Math.max(1,Math.min(6,zoomScale*(e.deltaY<0?1.15:0.87)));if(zoomScale===1){zoomX=0;zoomY=0}applyZoom()},{passive:false});\n    stage.addEventListener('touchstart',function(e){\n      if(e.touches.length>=2){pinchStartDist=dist(e.touches[0],e.touches[1]);pinchStartScale=zoomScale}\n      else if(e.touches.length===1&&zoomScale>1){panStartX=e.touches[0].clientX;panStartY=e.touches[0].clientY;panOriginX=zoomX;panOriginY=zoomY}\n    },{passive:false});\n    stage.addEventListener('touchmove',function(e){\n      e.preventDefault();\n      if(e.touches.length>=2&&pinchStartDist>0){zoomScale=Math.max(1,Math.min(6,pinchStartScale*(dist(e.touches[0],e.touches[1])/pinchStartDist)));if(zoomScale===1){zoomX=0;zoomY=0}applyZoom()}\n      else if(e.touches.length===1&&zoomScale>1){zoomX=panOriginX+(e.touches[0].clientX-panStartX);zoomY=panOriginY+(e.touches[0].clientY-panStartY);applyZoom()}\n    },{passive:false});\n    stage.addEventListener('touchend',function(e){if(e.touches.length<2)pinchStartDist=0},{passive:false});\n  });\n})();\n</script>\n'''
+          if 'shirli-v87-js' not in s:
+              s=s.replace('</body>',zoom_js+'</body>',1)
+
+          s=s.replace("const APP_VERSION = 'v86';","const APP_VERSION = 'v87';")
+          p.write_text(s,encoding='utf-8')
+
+          # Products: migrate old default folders to the new Shirley categories while preserving custom products.
+          q=Path('sw.js')
+          w=q.read_text(encoding='utf-8')
+          old_defaults="""      const defaults=[\n        {name:'תיקים',category:'תיקים',emoji:'👜'},{name:'מפות שולחן',category:'מפות שולחן',emoji:'🪡'},{name:'תמונות',category:'תמונות',emoji:'🖼️'},\n        {name:'שעונים',category:'שעונים',emoji:'🕰️'},{name:'תכשיטים',category:'תכשיטים',emoji:'📿'},{name:'שולחנות',category:'שולחנות',emoji:'🪵'}\n      ];"""
+          new_defaults="""      const defaults=[\n        {name:'תמונות',category:'תמונות',emoji:'🖼️'},\n        {name:'מדבקות',category:'מדבקות',emoji:'🏷️'},\n        {name:'חולצות מודפסות',category:'חולצות מודפסות',emoji:'👕'},\n        {name:'תיקים',category:'תיקים',emoji:'👜'},\n        {name:'מפות - פלייסמנט',category:'מפות - פלייסמנט',emoji:'🧵'},\n        {name:'שונות',category:'שונות',emoji:'✨'}\n      ];"""
+          if old_defaults not in w: raise SystemExit('product defaults not found')
+          w=w.replace(old_defaults,new_defaults,1)
+          needle="""      function read(){try{let x=JSON.parse(localStorage.getItem(K)||'null');return Array.isArray(x)?x:defaults.slice()}catch(e){return defaults.slice()}}\n      function save(x){try{localStorage.setItem(K,JSON.stringify(x))}catch(e){}}"""
+          repl="""      function read(){try{let x=JSON.parse(localStorage.getItem(K)||'null');return Array.isArray(x)?x:defaults.slice()}catch(e){return defaults.slice()}}\n      function save(x){try{localStorage.setItem(K,JSON.stringify(x))}catch(e){}}\n      function migrateProductFolders(){\n        try{\n          const mk='shirliProductsV87'; if(localStorage.getItem(mk)==='1') return;\n          const old=new Set(['תיקים','מפות שולחן','תמונות','שעונים','תכשיטים','שולחנות']);\n          let current=read();\n          const custom=current.filter(x=>!(old.has(x.name)&&!x.price&&!x.image));\n          save(defaults.concat(custom)); localStorage.setItem(mk,'1');\n        }catch(e){}\n      }"""
+          if needle not in w: raise SystemExit('product read/save block not found')
+          w=w.replace(needle,repl,1)
+          w=w.replace("document.addEventListener('DOMContentLoaded',()=>{resetShirleyTracking();ensureProducts();homeFix();addPageFix();adminFix();setTimeout(()=>{homeFix();addPageFix()},250)});",
+                      "document.addEventListener('DOMContentLoaded',()=>{resetShirleyTracking();migrateProductFolders();ensureProducts();homeFix();addPageFix();adminFix();setTimeout(()=>{homeFix();addPageFix()},250)});",1)
+          w=re.sub(r"const CACHE='shirli-v\\d+';","const CACHE='shirli-v62';",w)
+          q.write_text(w,encoding='utf-8')
+
+          l=Path('landing.html')
+          x=l.read_text(encoding='utf-8')
+          x=re.sub(r'v=\\d+','v=87',x)
+          l.write_text(x,encoding='utf-8')
           PY
           git config user.name github-actions
           git config user.email github-actions@github.com
           git add index.html sw.js landing.html
-          git commit -m 'Finalize Shirley home and help v86'
+          git commit -m 'Update products and slideshow zoom v87'
           git push
