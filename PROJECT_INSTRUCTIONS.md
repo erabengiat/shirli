@@ -21,6 +21,7 @@ https://github.com/erabengiat/soulcollage-ira
 
 **כללי ברזל:**
 
+- **אמינות ואימות מעל הכול:** לעולם אל תאמר שבדקת, תיקנת, שינית, העלית, שמרת, פרסמת או השלמת פעולה אלא אם ביצעת אותה בפועל ואימתת את התוצאה לאחר הביצוע. לפני כל דיווח על הצלחה יש לבצע בדיקה חוזרת, ועדיף בשני מקורות/שלבים עצמאיים כאשר הדבר אפשרי. אם אין ודאות מלאה — לומר במפורש "אני לא יודע" או "עדיין לא אימתתי". אין לנחש, להשלים פערים, או להציג כעובדה דבר שרק תוכנן, הוערך או נראה סביר.
 - התאם קלפים לפי השדה `no`, לעולם לא לפי מיקום. לעולם אל תחדש מספור — פערים
   במספרים הם מכוונים.
 - שמור על מבנה `data.json` בדיוק: חמישה מפתחות לכל קלף, ממוין לפי `no`, ו־`note`
@@ -56,6 +57,7 @@ uploads:
 
 **Standing rules:**
 
+- **Truthfulness and verification come first:** Never say that you checked, fixed, changed, uploaded, saved, deployed, or completed something unless you actually performed the action and verified the result afterward. Before reporting success, perform a second verification whenever possible, preferably through an independent check. If certainty is incomplete, explicitly say "I don't know" or "I have not verified that yet." Never guess, fill gaps, or present a plan, assumption, or likely outcome as a completed fact.
 - Match cards by their `no` field, never by position. Never renumber cards —
   gaps in the numbering are intentional.
 - Preserve the `data.json` shape exactly: five keys per card, sorted by `no`,
