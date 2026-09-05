@@ -2,7 +2,7 @@
    Network-first, with a small HTML cleanup layer for the Shirley version.
 */
 
-const CACHE = 'shirli-v44';
+const CACHE = 'shirli-v45';
 
 self.addEventListener('install', (e) => {
   self.skipWaiting();
@@ -23,11 +23,11 @@ function cleanShirleyHtml(res) {
   if (!res.ok || !type.includes('text/html')) return Promise.resolve(res);
 
   return res.text().then((html) => {
-    /* Hide SoulCollage-only reading UI and all per-page metadata.
-       In Shirley's collection, opening a page should show the image only. */
     const marker = `
 <style id="shirli-clean-ui">
   .g-read{display:none!important;}
+
+  /* Page detail: image only. */
   #cardDetail .fld,
   #cardDetail .fld-label,
   #cardDetail .fld-note-label,
@@ -38,14 +38,29 @@ function cleanShirleyHtml(res) {
   #cardDetail .edit-btn-inline{display:none!important;}
   #cardDetail .detail{padding-bottom:18px!important;}
   #cardDetail .detail-img{margin-bottom:0!important;}
+
+  /* Book gallery: never show legacy names/captions under Shirley's images. */
+  #cardsGrid .detail-name,
+  #cardsGrid .detail-meta,
+  #cardsGrid .card-name,
+  #cardsGrid .card-title,
+  #cardsGrid .thumb-name,
+  #cardsGrid .thumb-title,
+  #cardsGrid .caption,
+  #cardsGrid figcaption{display:none!important;}
 </style>`;
 
     if (!html.includes('shirli-clean-ui')) {
       html = html.replace('</head>', marker + '\n</head>');
     }
 
-    /* Book view: keep one continuous list of pages; remove the separate
-       "דפים לרוחב" section and stop moving landscape pages into it. */
+    /* Book view: image tiles only, with no c.name caption. */
+    html = html.replace(
+      "      '</div>'+\n      '<div style=\"font-family:\\\'Varela Round\\\',sans-serif;font-size:14px;text-align:center;color:#244F5E;margin-top:7px;\">'+c.name+'</div>';",
+      "      '</div>';"
+    );
+
+    /* Keep one continuous list; no separate landscape section. */
     html = html.replace("wideTitle.textContent='דפים לרוחב';", "wideTitle.textContent='';");
     html = html.replace("wideTitle.style.display='block';", "wideTitle.style.display='none';");
     html = html.replace("wideWrap.appendChild(el);          // move to the wide group", "/* Shirley: keep landscape pages in the main list */");
