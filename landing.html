@@ -23,7 +23,7 @@ h1{font-family:Georgia,serif;font-weight:400;font-size:clamp(30px,9vw,42px);line
 <body>
 <div class="wrap" id="wrap">
   <div class="brand">
-    <img class="logo" src="shirley-logo.png?v=53" alt="הלוגו של שירלי רגב">
+    <img class="logo" src="shirley-logo.png?v=81" alt="הלוגו של שירלי רגב">
     <h1>Shirley Regev</h1>
     <div class="he">שירלי רגב</div>
     <div class="tag">בשפת הטבע<br>ליווי בחיבור לטבע הפנימי והחיצוני</div>
@@ -35,14 +35,16 @@ h1{font-family:Georgia,serif;font-weight:400;font-size:clamp(30px,9vw,42px);line
     <a class="link" href="https://www.instagram.com/shirley.regev/" target="_blank" rel="noopener" onclick="hold(event)"><span class="icon">◎</span><span>Instagram<span class="small">shirley.regev</span></span></a>
     <a class="link" href="https://www.facebook.com/regev.shirley" target="_blank" rel="noopener" onclick="hold(event)"><span class="icon">f</span><span>Facebook<span class="small">שירלי רגב בשפת הטבע</span></span></a>
   </div>
-  <div class="continue">נוגעים במסך כדי להמשיך · מעבר אוטומטי בעוד 3 שניות</div>
+  <div class="continue" id="continueText">נוגעים במסך כדי להמשיך · מעבר אוטומטי בעוד 3 שניות</div>
 </div>
 <script>
 if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{});}
-let timer=setTimeout(go,3000);
-function go(){ location.href='index.html?v=53&fromLanding=1'; }
-function hold(e){ e.stopPropagation(); clearTimeout(timer); }
-document.getElementById('wrap').addEventListener('click',function(e){ if(!e.target.closest('a')) go(); });
+const stay=new URLSearchParams(location.search).get('stay')==='1';
+let timer=stay?null:setTimeout(go,3000);
+function go(){ location.href='index.html?v=81&fromLanding=1'; }
+function hold(e){ e.stopPropagation(); if(timer) clearTimeout(timer); }
+document.getElementById('wrap').addEventListener('click',function(e){ if(!e.target.closest('a')&&!stay) go(); });
+if(stay){const c=document.getElementById('continueText');if(c)c.textContent='מסך שירלי רגב · אפשר לבחור קישור או לסגור את האפליקציה';}
 </script>
 </body>
 </html>
