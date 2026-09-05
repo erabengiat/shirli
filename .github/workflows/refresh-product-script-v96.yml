@@ -1,0 +1,30 @@
+name: Refresh home layout script
+on:
+  push:
+    paths:
+      - '.github/workflows/refresh-product-script-v96.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Bump script version and service worker cache
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('sw.js')
+          s=p.read_text(encoding='utf-8')
+          s=s.replace("const CACHE='shirli-v71';","const CACHE='shirli-v72';")
+          s=s.replace('product-examples.js?v=91','product-examples.js?v=96')
+          p.write_text(s,encoding='utf-8')
+          PY
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add sw.js
+          git commit -m "Refresh home layout script v96" || exit 0
+          git push
