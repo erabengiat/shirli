@@ -8,22 +8,25 @@
 :root{--green:#184f39;--cream:#f7f0df;--gold:#b48a45;--line:#75966c}
 *{box-sizing:border-box}
 html,body{margin:0;width:100%;height:100%;background:var(--cream);font-family:Arial,sans-serif;color:var(--green);overflow:hidden}
-.wrap{height:100dvh;max-width:430px;margin:0 auto;background:radial-gradient(circle at 50% 18%,#fffaf0 0,#f7f0df 72%);padding:14px 16px 16px;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;position:relative}
-.logo{width:min(54vw,220px);aspect-ratio:1;border-radius:50%;background:#fff url('logo-shirley.svg?v=1') center/cover no-repeat;box-shadow:0 5px 18px rgba(0,0,0,.14);flex:0 0 auto}
-h1{font-family:Georgia,serif;font-weight:400;font-size:clamp(32px,10vw,44px);line-height:1;margin:2px 0 0;color:var(--green)}
-.he{font-size:clamp(22px,7vw,29px);margin:0}.tag{font-size:clamp(16px,5vw,21px);color:var(--gold);margin-bottom:6px}
-.links{width:100%;display:grid;grid-template-columns:1fr 1fr;gap:9px}
-.link{display:flex;align-items:center;justify-content:center;gap:7px;min-height:58px;padding:7px 8px;border:1.5px solid var(--line);border-radius:22px;background:rgba(255,255,255,.5);text-decoration:none;color:var(--green);font-size:13px;font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,.05)}
-.icon{font-size:24px;line-height:1}.small{font-size:11px;font-weight:400;display:block;margin-top:2px;word-break:break-word}.continue{font-size:13px;opacity:.83;margin-top:4px}
-@media(max-height:690px){.wrap{gap:5px;padding-top:8px}.logo{width:min(41vw,165px)}h1{font-size:32px}.he{font-size:22px}.tag{font-size:16px}.link{min-height:50px}.continue{font-size:11px}}
+.wrap{height:100dvh;max-width:430px;margin:0 auto;background:radial-gradient(circle at 50% 14%,#fffaf0 0,#f7f0df 72%);padding:18px 16px calc(18px + env(safe-area-inset-bottom));text-align:center;display:flex;flex-direction:column;align-items:stretch;justify-content:space-evenly;position:relative}
+.brand{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:4px 0}
+h1{font-family:Georgia,serif;font-weight:400;font-size:clamp(36px,11vw,48px);line-height:1;margin:0;color:var(--green)}
+.he{font-size:clamp(24px,7vw,31px);margin:0}.tag{font-size:clamp(17px,5vw,21px);color:var(--gold);line-height:1.35}
+.rule{width:68%;height:1px;background:linear-gradient(90deg,transparent,var(--line),transparent);margin:2px auto}
+.links{width:100%;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.link{display:flex;align-items:center;justify-content:center;gap:8px;min-height:66px;padding:8px 9px;border:1.5px solid var(--line);border-radius:22px;background:rgba(255,255,255,.5);text-decoration:none;color:var(--green);font-size:13px;font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.icon{font-size:25px;line-height:1}.small{font-size:11px;font-weight:400;display:block;margin-top:3px;word-break:break-word}.continue{font-size:13px;opacity:.83}
+@media(max-height:680px){.wrap{padding-top:10px;padding-bottom:10px}.brand{gap:5px}h1{font-size:34px}.he{font-size:22px}.tag{font-size:15px}.link{min-height:54px}.continue{font-size:11px}}
 </style>
 </head>
 <body>
 <div class="wrap" id="wrap">
-  <div class="logo" aria-label="הלוגו של שירלי רגב"></div>
-  <h1>Shirley Regev</h1>
-  <div class="he">שירלי רגב</div>
-  <div class="tag">בשפת הטבע · יצירה · חיבור · השראה</div>
+  <div class="brand">
+    <h1>Shirley Regev</h1>
+    <div class="he">שירלי רגב</div>
+    <div class="tag">בשפת הטבע<br>ליווי בחיבור לטבע הפנימי והחיצוני</div>
+    <div class="rule"></div>
+  </div>
   <div class="links">
     <a class="link" href="tel:+972523317195" onclick="hold(event)"><span class="icon">☎</span><span>052-3317195<span class="small">התקשרו לשירלי</span></span></a>
     <a class="link" href="mailto:shirley.regev@gmail.com" onclick="hold(event)"><span class="icon">✉</span><span>אימייל<span class="small">shirley.regev@gmail.com</span></span></a>
@@ -35,7 +38,7 @@ h1{font-family:Georgia,serif;font-weight:400;font-size:clamp(32px,10vw,44px);lin
 <script>
 if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{});}
 let timer=setTimeout(go,3000);
-function go(){ location.href='index.html?v=48&fromLanding=1'; }
+function go(){ location.href='index.html?v=50&fromLanding=1'; }
 function hold(e){ e.stopPropagation(); clearTimeout(timer); }
 document.getElementById('wrap').addEventListener('click',function(e){ if(!e.target.closest('a')) go(); });
 </script>
