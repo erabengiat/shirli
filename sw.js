@@ -1,5 +1,5 @@
 /* Shirley app service worker */
-const CACHE='shirli-v52';
+const CACHE='shirli-v53';
 self.addEventListener('install',e=>self.skipWaiting());
 self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(xs=>Promise.all(xs.filter(x=>x!==CACHE).map(x=>caches.delete(x)))).then(()=>self.clients.claim())));
 
@@ -8,7 +8,7 @@ function isHtml(res){return !!res && (res.headers.get('content-type')||'').inclu
 function cleanHtml(res){
   if(!res.ok||!isHtml(res)) return Promise.resolve(res);
   return res.text().then(html=>{
-    const css=`<style id="shirli-v52-css">
+    const css=`<style id="shirli-v53-css">
       .g-read{display:none!important}
 
       /* Never show the incorrect generated Shirley logo. */
@@ -18,7 +18,7 @@ function cleanHtml(res){
       /* The thank-you / entry screen must fit a phone without scrolling. */
       #cover.active{height:100dvh!important;min-height:100dvh!important;max-height:100dvh!important;overflow:hidden!important}
       #cover .cover-wrap{height:100%!important;min-height:0!important;max-height:100%!important;padding:14px 16px!important;justify-content:space-evenly!important;gap:6px!important;overflow:hidden!important}
-      #cover .cover-mark{display:block!important}
+      #cover .cover-mark{display:block!important;width:clamp(104px,28vw,132px)!important;height:clamp(104px,28vw,132px)!important;min-width:0!important;min-height:0!important;margin:0 auto!important;border-radius:50%!important;background-image:url('shirley-logo.png')!important;background-size:cover!important;background-position:center!important}
       #cover .cover-title{font-size:clamp(20px,4.5vh,26px)!important;line-height:1.12!important;margin:0!important}
       #cover .cover-title span{font-size:clamp(15px,3.2vh,18px)!important}
       #cover .cover-thanks{padding:10px 12px!important;margin:0!important}
@@ -30,16 +30,19 @@ function cleanHtml(res){
 
       /* Home screen also fits one phone screen. */
       #home.active{height:100dvh!important;min-height:100dvh!important;max-height:100dvh!important;overflow:hidden!important;justify-content:flex-start!important}
-      #home .topbar{padding:5px 20px 1px!important;min-height:32px!important;flex:0 0 auto!important}
-      #home .topbar:after{content:'האוסף של שירלי';font-family:'Varela Round',sans-serif;font-size:18px;color:#244F5E;font-weight:700}
-      #home .group{margin:3px 12px!important;padding:5px 8px 6px!important;flex:0 0 auto!important}
+      #home .topbar{padding:8px 16px 4px!important;min-height:108px!important;flex:0 0 auto!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:4px!important}
+      #home .home-logo{display:block!important;width:70px!important;height:70px!important;min-width:70px!important;min-height:70px!important;border-radius:50%!important;background:url('shirley-logo.png') center/cover no-repeat!important;box-shadow:0 3px 10px rgba(42,58,71,.16)!important;margin:0 auto!important}
+      #home .topbar:after{content:'האוסף של שירלי';font-family:'Varela Round',sans-serif;font-size:17px;color:#244F5E;font-weight:700;text-align:center}
+      #home .group{margin:3px 12px!important;padding:5px 8px 6px!important;flex:1 1 0!important;display:flex!important;flex-direction:column!important;justify-content:center!important}
       #home .group-title{font-size:11px!important;margin-bottom:3px!important}
       #home .group-row{gap:6px!important}
       #home .tile{min-height:68px!important;padding:2px!important;gap:2px!important}
       #home .tile .disc{width:47px!important;height:47px!important;border-radius:14px!important}
       #home .tile .disc svg{width:24px!important;height:24px!important}
       #home .tile-label{font-size:12px!important;line-height:1.05!important}
-      #home .bottom-row{padding:2px 12px 4px!important;gap:6px!important;flex:0 0 auto!important}
+      #home .bottom-row{padding:6px 12px 10px!important;gap:10px!important;flex:1 1 0!important;align-items:center!important}
+      #home .group-row{width:100%!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;align-items:center!important}
+      #home .g-cards .group-row{grid-template-columns:repeat(2,minmax(0,1fr))!important}
 
       /* Add page: only image source + book selection remain. */
       #addCard #addBook{font-size:18px!important;min-height:48px!important}
@@ -62,7 +65,7 @@ function cleanHtml(res){
       #products .product-info{text-align:center;padding:8px}.product-name{font-weight:700;color:#244F5E}.product-price{color:#C0673B;font-weight:700;margin-top:3px}.product-cat{font-size:11px;opacity:.7;margin-top:2px}
       #productAdmin{margin-top:20px;border-top:1px solid rgba(36,79,94,.18);padding-top:16px}
     </style>`;
-    if(!html.includes('shirli-v52-css')) html=html.replace('</head>',css+'\n</head>');
+    if(!html.includes('shirli-v53-css')) html=html.replace('</head>',css+'\n</head>');
 
     /* Music: calm Chopin nocturne, slow fade to 45%. */
     html=html.replace("const MUSIC_SRC='music/beloved.mp3';","const MUSIC_SRC='https://commons.wikimedia.org/wiki/Special:Redirect/file/Nocturne_Op._9_no._2_in_E_flat_major.mp3';");
