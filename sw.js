@@ -1,5 +1,5 @@
 /* Shirley app service worker */
-const CACHE='shirli-v68';
+const CACHE='shirli-v70';
 self.addEventListener('install',e=>self.skipWaiting());
 self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(xs=>Promise.all(xs.filter(x=>x!==CACHE).map(x=>caches.delete(x)))).then(()=>self.clients.claim())));
 
@@ -30,8 +30,8 @@ function cleanHtml(res){
 
       /* Home screen also fits one phone screen. */
       #home.active{height:100dvh!important;min-height:100dvh!important;max-height:100dvh!important;overflow:hidden!important;justify-content:flex-start!important}
-      #home .topbar{padding:8px 16px 4px!important;min-height:108px!important;flex:0 0 auto!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:4px!important}
-      #home .home-logo{display:block!important;width:70px!important;height:70px!important;min-width:70px!important;min-height:70px!important;border-radius:50%!important;background:url('shirley-logo.png') center/cover no-repeat!important;box-shadow:0 3px 10px rgba(42,58,71,.16)!important;margin:0 auto!important}
+      #home .topbar{padding:3px 16px 1px!important;min-height:76px!important;flex:0 0 auto!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:1px!important}
+      #home .home-logo{display:block!important;width:48px!important;height:48px!important;min-width:48px!important;min-height:48px!important;border-radius:50%!important;background:url('shirley-logo.png') center/cover no-repeat!important;box-shadow:0 2px 8px rgba(42,58,71,.14)!important;margin:0 auto!important}
       #home .topbar:after{content:'האוסף של שירלי';font-family:'Varela Round',sans-serif;font-size:17px;color:#244F5E;font-weight:700;text-align:center}
       #home .group{margin:3px 12px!important;padding:5px 8px 6px!important;flex:1 1 0!important;display:flex!important;flex-direction:column!important;justify-content:center!important}
       #home .group-title{font-size:11px!important;margin-bottom:3px!important}
