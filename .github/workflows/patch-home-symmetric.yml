@@ -1,0 +1,52 @@
+name: Patch Shirley symmetric home
+on:
+  push:
+    paths:
+      - '.github/workflows/patch-home-symmetric.yml'
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch home layout
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+          marker='/* SHIRLI HOME SYMMETRIC V79 */'
+          css='''\n<style>\n/* SHIRLI HOME SYMMETRIC V79 */\n#home.active{height:100dvh;min-height:100dvh;max-height:100dvh;overflow:hidden;display:flex;flex-direction:column;}\n#home .topbar{flex:0 0 auto;min-height:92px;padding:8px 16px 4px;display:flex;align-items:center;justify-content:center;}\n#home .home-logo{display:block!important;width:76px;height:76px;border-radius:50%;background:url('shirley-logo.png?v=79') center/cover no-repeat!important;box-shadow:0 3px 12px rgba(42,58,71,.18);}\n#home .topbar:after{display:none!important;content:none!important;}\n#home .group{flex:1 1 0;margin:0 12px;padding:4px 8px;display:flex;flex-direction:column;justify-content:center;}\n#home .group-title{text-align:center;margin:0 0 5px;font-size:12px;}\n#home .group-row{width:100%;display:grid!important;gap:10px 14px!important;align-items:start;justify-items:stretch;}\n#home .group-row.two{grid-template-columns:repeat(2,minmax(0,1fr))!important;}\n#home .group-row.three{grid-template-columns:repeat(3,minmax(0,1fr))!important;}\n#home .group-row.two>.tile:nth-child(1),#home .group-row.two>.tile:nth-child(2){grid-column:auto!important;}\n#home .tile{width:100%;min-width:0;min-height:82px;padding:3px 1px;display:flex!important;align-items:center;justify-content:flex-start;}\n#home .tile .disc,#home .tile.small .disc{width:58px!important;height:58px!important;min-width:58px;min-height:58px;border-radius:15px!important;}\n#home .tile-label,#home .tile.small .tile-label{font-size:13px!important;line-height:1.15!important;min-height:30px;display:flex;align-items:center;justify-content:center;}\n#home .bottom-row{flex:1 1 0;margin:0 12px;padding:4px 8px 10px;display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px 14px!important;align-items:center;}\n#home .bottom-row .tile{align-self:center;}\n#home+.footer,#home~.footer#appVersion{display:none!important;}\n@media(max-height:700px){#home .topbar{min-height:76px;padding-top:4px}#home .home-logo{width:62px;height:62px}#home .tile{min-height:68px}#home .tile .disc,#home .tile.small .disc{width:50px!important;height:50px!important;min-width:50px;min-height:50px}#home .tile-label,#home .tile.small .tile-label{font-size:12px!important;min-height:24px}}\n</style>\n'''
+          if marker not in s:
+              s=s.replace('</head>',css+'\n</head>',1)
+          s=s.replace("const APP_VERSION = 'v78';","const APP_VERSION = 'v79';")
+          s=s.replace("const APP_VERSION = 'v77';","const APP_VERSION = 'v79';")
+          p.write_text(s,encoding='utf-8')
+
+          q=Path('sw.js')
+          w=q.read_text(encoding='utf-8')
+          w=w.replace("const CACHE='shirli-v53';","const CACHE='shirli-v54';")
+          w=w.replace("const CACHE='shirli-v52';","const CACHE='shirli-v54';")
+          # Neutralize older compact-home overrides so index V79 is authoritative.
+          for old,new in [
+            ("#home .topbar{padding:5px 20px 1px!important;min-height:32px!important;flex:0 0 auto!important}","#home .topbar{flex:0 0 auto!important}"),
+            ("#home .topbar:after{content:'האוסף של שירלי';font-family:'Varela Round',sans-serif;font-size:18px;color:#244F5E;font-weight:700}","#home .topbar:after{display:none!important;content:none!important}"),
+            ("#home .group{margin:3px 12px!important;padding:5px 8px 6px!important;flex:0 0 auto!important}","#home .group{margin:0 12px!important;padding:4px 8px!important;flex:1 1 0!important}"),
+            ("#home .group-row{gap:6px!important}","#home .group-row{gap:10px 14px!important}"),
+            ("#home .tile{min-height:68px!important;padding:2px!important;gap:2px!important}","#home .tile{min-height:82px!important;padding:3px 1px!important;gap:5px!important}"),
+            ("#home .tile .disc{width:47px!important;height:47px!important;border-radius:14px!important}","#home .tile .disc{width:58px!important;height:58px!important;border-radius:15px!important}"),
+            ("#home .tile-label{font-size:12px!important;line-height:1.05!important}","#home .tile-label{font-size:13px!important;line-height:1.15!important}"),
+            ("#home .bottom-row{padding:2px 12px 4px!important;gap:6px!important;flex:0 0 auto!important}","#home .bottom-row{padding:4px 20px 10px!important;gap:14px!important;flex:1 1 0!important}")
+          ]:
+              w=w.replace(old,new)
+          q.write_text(w,encoding='utf-8')
+          PY
+      - name: Commit patch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html sw.js
+          git diff --cached --quiet && exit 0
+          git commit -m "Arrange Shirley home tiles symmetrically"
+          git push
