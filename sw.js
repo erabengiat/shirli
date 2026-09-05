@@ -1,5 +1,5 @@
 /* Shirley app service worker */
-const CACHE='shirli-v53';
+const CACHE='shirli-v54';
 self.addEventListener('install',e=>self.skipWaiting());
 self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(xs=>Promise.all(xs.filter(x=>x!==CACHE).map(x=>caches.delete(x)))).then(()=>self.clients.claim())));
 
@@ -35,11 +35,11 @@ function cleanHtml(res){
       #home .topbar:after{content:'האוסף של שירלי';font-family:'Varela Round',sans-serif;font-size:17px;color:#244F5E;font-weight:700;text-align:center}
       #home .group{margin:3px 12px!important;padding:5px 8px 6px!important;flex:1 1 0!important;display:flex!important;flex-direction:column!important;justify-content:center!important}
       #home .group-title{font-size:11px!important;margin-bottom:3px!important}
-      #home .group-row{gap:6px!important}
-      #home .tile{min-height:68px!important;padding:2px!important;gap:2px!important}
-      #home .tile .disc{width:47px!important;height:47px!important;border-radius:14px!important}
+      #home .group-row{gap:10px 14px!important}
+      #home .tile{min-height:82px!important;padding:3px 1px!important;gap:5px!important}
+      #home .tile .disc{width:58px!important;height:58px!important;border-radius:15px!important}
       #home .tile .disc svg{width:24px!important;height:24px!important}
-      #home .tile-label{font-size:12px!important;line-height:1.05!important}
+      #home .tile-label{font-size:13px!important;line-height:1.15!important}
       #home .bottom-row{padding:6px 12px 10px!important;gap:10px!important;flex:1 1 0!important;align-items:center!important}
       #home .group-row{width:100%!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;align-items:center!important}
       #home .g-cards .group-row{grid-template-columns:repeat(2,minmax(0,1fr))!important}
