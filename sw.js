@@ -1,5 +1,5 @@
 /* Shirley app service worker */
-const CACHE='shirli-v48';
+const CACHE='shirli-v49';
 self.addEventListener('install',e=>self.skipWaiting());
 self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(xs=>Promise.all(xs.filter(x=>x!==CACHE).map(x=>caches.delete(x)))).then(()=>self.clients.claim())));
 
@@ -7,7 +7,7 @@ function isHtml(res){return !!res && (res.headers.get('content-type')||'').inclu
 function cleanHtml(res){
   if(!res.ok||!isHtml(res)) return Promise.resolve(res);
   return res.text().then(html=>{
-    const css=`<style id="shirli-v48-css">
+    const css=`<style id="shirli-v49-css">
       .g-read{display:none!important}
       #home.active{height:100dvh!important;min-height:100dvh!important;max-height:100dvh!important;overflow:hidden!important;justify-content:flex-start!important}
       #home .topbar{padding:6px 20px 2px!important;min-height:70px!important;flex:0 0 auto!important}
@@ -32,7 +32,7 @@ function cleanHtml(res){
       #products .product-info{text-align:center;padding:8px}.product-name{font-weight:700;color:#244F5E}.product-price{color:#C0673B;font-weight:700;margin-top:3px}.product-cat{font-size:11px;opacity:.7;margin-top:2px}
       #productAdmin{margin-top:20px;border-top:1px solid rgba(36,79,94,.18);padding-top:16px}
     </style>`;
-    if(!html.includes('shirli-v48-css')) html=html.replace('</head>',css+'\n</head>');
+    if(!html.includes('shirli-v49-css')) html=html.replace('</head>',css+'\n</head>');
 
     html=html.replace("const MUSIC_SRC='music/beloved.mp3';","const MUSIC_SRC='https://commons.wikimedia.org/wiki/Special:Redirect/file/Nocturne_Op._9_no._2_in_E_flat_major.mp3';");
     html=html.replace('const MUSIC_VOL=0.55;','const MUSIC_VOL=0.45;');
@@ -43,12 +43,24 @@ function cleanHtml(res){
     html=html.replace(/<button class=\"btn secondary\" onclick=\"showGuide\('full'\)\">מדריך מפורט<\/button>/g,'');
     html=html.replace(/האוסף של עירא/g,'האוסף של שירלי').replace(/סול קולאז\\' של עירא/g,'האוסף של שירלי').replace(/אוסף הקולאז\\'ים/g,'אוסף העבודות');
 
-    const js=`<script id="shirli-v48-js">(function(){
+    const js=`<script id="shirli-v49-js">(function(){
       const K='shirliProducts';
       const defaults=[
         {name:'תיקים',category:'תיקים',emoji:'👜'},{name:'מפות שולחן',category:'מפות שולחן',emoji:'🪡'},{name:'תמונות',category:'תמונות',emoji:'🖼️'},
         {name:'שעונים',category:'שעונים',emoji:'🕰️'},{name:'תכשיטים',category:'תכשיטים',emoji:'📿'},{name:'שולחנות',category:'שולחנות',emoji:'🪵'}
       ];
+      function resetShirleyTracking(){
+        try{
+          const marker='shirliTrackingResetV1';
+          if(localStorage.getItem(marker)!=='1'){
+            localStorage.removeItem('activityLog');
+            localStorage.removeItem('usageLog');
+            localStorage.setItem('activityLog',JSON.stringify([{t:new Date().toISOString(),text:'התחלת לוג חדש — האוסף של שירלי'}]));
+            localStorage.setItem(marker,'1');
+            if(typeof sessionStart!=='undefined') sessionStart=Date.now();
+          }
+        }catch(e){}
+      }
       function read(){try{let x=JSON.parse(localStorage.getItem(K)||'null');return Array.isArray(x)?x:defaults.slice()}catch(e){return defaults.slice()}}
       function save(x){try{localStorage.setItem(K,JSON.stringify(x))}catch(e){}}
       function esc(x){return String(x==null?'':x).replace(/[&<>\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]))}
@@ -68,10 +80,10 @@ function cleanHtml(res){
       function fixSlideshow(){
         window.renderSlide=function(){let c=(typeof slideOrder!=='undefined'&&slideOrder.length)?slideOrder[slideIdx]:null,body=document.getElementById('slideBody');if(!body)return;if(!c){body.innerHTML='';return}let src=c.img||('images/'+c.no+'.jpg');let img=document.createElement('img');img.className='slide-img';img.alt='';img.onerror=()=>{let fallback='images/'+c.no+'.jpg';if(img.getAttribute('data-fallback')!=='1'){img.setAttribute('data-fallback','1');img.src=fallback}else{body.innerHTML='<div style="color:#fff;font-size:14px">לא ניתן לטעון את התמונה</div>'}};body.innerHTML='';body.appendChild(img);img.src=src};
       }
-      document.addEventListener('DOMContentLoaded',()=>{ensureProducts();homeFix();adminFix();fixSlideshow();setTimeout(homeFix,250)});
+      document.addEventListener('DOMContentLoaded',()=>{resetShirleyTracking();ensureProducts();homeFix();adminFix();fixSlideshow();setTimeout(homeFix,250)});
       window.addEventListener('load',()=>setTimeout(()=>{homeFix();adminFix();fixSlideshow()},300));
     })();</script>`;
-    if(!html.includes('shirli-v48-js')) html=html.replace('</body>',js+'\n</body>');
+    if(!html.includes('shirli-v49-js')) html=html.replace('</body>',js+'\n</body>');
     const headers=new Headers(res.headers);headers.delete('content-length');return new Response(html,{status:res.status,statusText:res.statusText,headers});
   });
 }
