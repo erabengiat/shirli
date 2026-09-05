@@ -13,28 +13,20 @@ jobs:
           python - <<'PY'
           from pathlib import Path
           import re
-
           p=Path('index.html')
-          s=p.read_text(encoding='utf-8')
-          s=s.replace("const APP_VERSION = 'v88';","const APP_VERSION = 'v89';")
+          s=p.read_text(encoding='utf-8').replace("const APP_VERSION = 'v88';","const APP_VERSION = 'v89';")
           p.write_text(s,encoding='utf-8')
-
           q=Path('sw.js')
           w=q.read_text(encoding='utf-8')
-          needle="      /* Products */\n"
-          css="""      /* Products */
-      #products .subhead{position:relative!important}
-      #products .back{position:absolute!important;inset-inline-start:12px!important;top:50%!important;transform:translateY(-50%)!important;width:48px!important;height:48px!important;min-width:48px!important;min-height:48px!important;border-radius:50%!important;background:rgba(255,255,255,.92)!important;color:#244F5E!important;font-size:34px!important;font-weight:700!important;line-height:44px!important;display:flex!important;align-items:center!important;justify-content:center!important;z-index:5!important;box-shadow:0 3px 10px rgba(36,79,94,.18)!important}
-"""
+          marker='      #products .products-grid{'
+          rule='      #products .subhead{position:relative!important}\n      #products .back{position:absolute!important;inset-inline-start:12px!important;top:50%!important;transform:translateY(-50%)!important;width:48px!important;height:48px!important;min-width:48px!important;min-height:48px!important;border-radius:50%!important;background:rgba(255,255,255,.92)!important;color:#244F5E!important;font-size:34px!important;font-weight:700!important;line-height:44px!important;display:flex!important;align-items:center!important;justify-content:center!important;z-index:5!important;box-shadow:0 3px 10px rgba(36,79,94,.18)!important}\n'
           if '#products .back{' not in w:
-              if needle not in w: raise SystemExit('products css marker not found')
-              w=w.replace(needle,css,1)
+              if marker not in w: raise SystemExit('products css marker not found')
+              w=w.replace(marker,rule+marker,1)
           w=re.sub(r"const CACHE='shirli-v\d+';","const CACHE='shirli-v64';",w)
           q.write_text(w,encoding='utf-8')
-
           l=Path('landing.html')
-          x=l.read_text(encoding='utf-8')
-          x=re.sub(r'v=\d+','v=89',x)
+          x=re.sub(r'v=\d+','v=89',l.read_text(encoding='utf-8'))
           l.write_text(x,encoding='utf-8')
           PY
           git config user.name github-actions
