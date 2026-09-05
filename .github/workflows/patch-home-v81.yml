@@ -1,0 +1,64 @@
+name: Patch Shirley home v81
+on:
+  push:
+    paths:
+      - '.github/workflows/patch-home-v81.yml'
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fix v80 markup and navigation
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+
+          # Fix literal backslash-n sequences that were accidentally inserted in v80 blocks.
+          a=s.find('\\n<style>\\n/* SHIRLI HOME GRID V80 */')
+          if a!=-1:
+              b=s.find('</style>\\n',a)
+              if b!=-1:
+                  b+=len('</style>\\n')
+                  seg=s[a:b].replace('\\n','\n')
+                  s=s[:a]+seg+s[b:]
+          a=s.find('\\n<script id="shirli-home-v80">\\n')
+          if a!=-1:
+              b=s.find('</script>\\n',a)
+              if b!=-1:
+                  b+=len('</script>\\n')
+                  seg=s[a:b].replace('\\n','\n')
+                  s=s[:a]+seg+s[b:]
+
+          s=s.replace("const APP_VERSION = 'v80';","const APP_VERSION = 'v81';")
+          s=s.replace("var _fab=document.getElementById('homeFab');if(_fab)_fab.style.display=(id==='slideshow')?'none':'flex';","var _fab=document.getElementById('homeFab');if(_fab)_fab.style.display=(id==='slideshow'||id==='home'||id==='cover')?'none':'flex';")
+          s=s.replace("b.onclick=()=>{location.href='landing.html?v=80'};","b.onclick=()=>{location.href='landing.html?v=81&stay=1'};")
+          p.write_text(s,encoding='utf-8')
+
+          q=Path('sw.js')
+          w=q.read_text(encoding='utf-8')
+          w=w.replace("const CACHE='shirli-v55';","const CACHE='shirli-v56';")
+          q.write_text(w,encoding='utf-8')
+
+          l=Path('landing.html')
+          x=l.read_text(encoding='utf-8')
+          x=x.replace("shirley-logo.png?v=53","shirley-logo.png?v=81")
+          x=x.replace("let timer=setTimeout(go,3000);\nfunction go(){ location.href='index.html?v=53&fromLanding=1'; }","const stay=new URLSearchParams(location.search).get('stay')==='1';\nlet timer=stay?null:setTimeout(go,3000);\nfunction go(){ location.href='index.html?v=81&fromLanding=1'; }")
+          x=x.replace("function hold(e){ e.stopPropagation(); clearTimeout(timer); }","function hold(e){ e.stopPropagation(); if(timer) clearTimeout(timer); }")
+          x=x.replace("document.getElementById('wrap').addEventListener('click',function(e){ if(!e.target.closest('a')) go(); });","document.getElementById('wrap').addEventListener('click',function(e){ if(!e.target.closest('a')&&!stay) go(); });")
+          x=x.replace("<div class=\"continue\">נוגעים במסך כדי להמשיך · מעבר אוטומטי בעוד 3 שניות</div>","<div class=\"continue\" id=\"continueText\">נוגעים במסך כדי להמשיך · מעבר אוטומטי בעוד 3 שניות</div>")
+          x=x.replace("</script>\n</body>","if(stay){const c=document.getElementById('continueText');if(c)c.textContent='מסך שירלי רגב · אפשר לבחור קישור או לסגור את האפליקציה';}\n</script>\n</body>")
+          l.write_text(x,encoding='utf-8')
+          PY
+      - name: Commit patch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html sw.js landing.html
+          git diff --cached --quiet && exit 0
+          git commit -m "Fix Shirley home grid and back navigation"
+          git push
