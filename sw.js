@@ -102,8 +102,12 @@ function cleanHtml(res){
     const js=`<script id="shirli-v50-js">(function(){
       const K='shirliProducts';
       const defaults=[
-        {name:'תיקים',category:'תיקים',emoji:'👜'},{name:'מפות שולחן',category:'מפות שולחן',emoji:'🪡'},{name:'תמונות',category:'תמונות',emoji:'🖼️'},
-        {name:'שעונים',category:'שעונים',emoji:'🕰️'},{name:'תכשיטים',category:'תכשיטים',emoji:'📿'},{name:'שולחנות',category:'שולחנות',emoji:'🪵'}
+        {name:'תמונות',category:'תמונות',emoji:'🖼️'},
+        {name:'מדבקות',category:'מדבקות',emoji:'🏷️'},
+        {name:'חולצות מודפסות',category:'חולצות מודפסות',emoji:'👕'},
+        {name:'תיקים',category:'תיקים',emoji:'👜'},
+        {name:'מפות - פלייסמנט',category:'מפות - פלייסמנט',emoji:'🧵'},
+        {name:'שונות',category:'שונות',emoji:'✨'}
       ];
 
       function resetShirleyTracking(){
@@ -121,6 +125,15 @@ function cleanHtml(res){
 
       function read(){try{let x=JSON.parse(localStorage.getItem(K)||'null');return Array.isArray(x)?x:defaults.slice()}catch(e){return defaults.slice()}}
       function save(x){try{localStorage.setItem(K,JSON.stringify(x))}catch(e){}}
+      function migrateProductFolders(){
+        try{
+          const mk='shirliProductsV87'; if(localStorage.getItem(mk)==='1') return;
+          const old=new Set(['תיקים','מפות שולחן','תמונות','שעונים','תכשיטים','שולחנות']);
+          let current=read();
+          const custom=current.filter(x=>!(old.has(x.name)&&!x.price&&!x.image));
+          save(defaults.concat(custom)); localStorage.setItem(mk,'1');
+        }catch(e){}
+      }
       function esc(x){return String(x==null?'':x).replace(/[&<>\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]))}
 
       function ensureProducts(){
@@ -184,7 +197,7 @@ function cleanHtml(res){
         host.appendChild(box);box.querySelector('#pa').onclick=()=>{let n=box.querySelector('#pn').value.trim();if(!n)return;let a=read();a.push({name:n,category:box.querySelector('#pc').value.trim()||'מוצר',price:box.querySelector('#pp').value.trim(),emoji:'✨'});save(a);box.querySelector('#pn').value='';box.querySelector('#pc').value='';box.querySelector('#pp').value='';renderProducts()};
       }
 
-      document.addEventListener('DOMContentLoaded',()=>{resetShirleyTracking();ensureProducts();homeFix();addPageFix();adminFix();setTimeout(()=>{homeFix();addPageFix()},250)});
+      document.addEventListener('DOMContentLoaded',()=>{resetShirleyTracking();migrateProductFolders();ensureProducts();homeFix();addPageFix();adminFix();setTimeout(()=>{homeFix();addPageFix()},250)});
       window.addEventListener('load',()=>setTimeout(()=>{homeFix();addPageFix();adminFix()},300));
     })();</script>`;
 

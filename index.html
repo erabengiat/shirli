@@ -645,6 +645,22 @@ if ('serviceWorker' in navigator) {
 </style>
 
 <style id="shirli-v86-css">#help button[onclick*="exportBackup"],#help button[onclick*="restoreFile"],#help button[onclick*="toggleEditingAllowed"],#help #publishWrap,#help #restoreFile{display:none!important}#home .topbar{min-height:106px!important;padding-top:12px!important}#home .home-logo{width:72px!important;height:72px!important;min-width:72px!important;min-height:72px!important;margin-top:5px!important}#home .home-title-v80{font-size:17px!important;margin-top:3px!important}#home .home-actions-grid-v80 .disc{width:58px!important;height:58px!important;min-width:58px!important;min-height:58px!important}#home .home-actions-grid-v80 .disc svg{width:30px!important;height:30px!important}#home .home-actions-grid-v80 .tile:nth-child(1) .disc{background:#c95f3c!important}#home .home-actions-grid-v80 .tile:nth-child(2) .disc{background:#244f5e!important}#home .home-actions-grid-v80 .tile:nth-child(3) .disc{background:#d9a441!important}#home .home-actions-grid-v80 .tile:nth-child(4) .disc{background:#4a7c8c!important}#home .home-actions-grid-v80 .tile:nth-child(5) .disc{background:#c98a3b!important}#home .home-actions-grid-v80 .tile:nth-child(6) .disc{background:#6e5a8a!important}#home .home-actions-grid-v80 .tile:nth-child(7) .disc{background:#3e6e5e!important}#home .home-actions-grid-v80 .tile:nth-child(8) .disc{background:#a84b6b!important}</style>
+
+<style id="shirli-v87-css">
+#slideMenu .add-form{display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;min-height:55vh!important}
+#slideMenu .slide-order-row{width:min(92vw,620px);display:flex;justify-content:center;align-items:stretch;gap:12px;margin:auto}
+#slideMenu .slide-order-btn{flex:1 1 0;min-width:0;min-height:116px;border:0;border-radius:20px;background:rgba(255,255,255,.72);box-shadow:0 5px 16px rgba(36,79,94,.14);color:#244F5E;font-family:'Varela Round',sans-serif;font-size:14px;font-weight:700;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;padding:10px 6px;cursor:pointer}
+#slideMenu .slide-order-btn:nth-child(1){background:#f0d5c8}
+#slideMenu .slide-order-btn:nth-child(2){background:#d8e6ea}
+#slideMenu .slide-order-btn:nth-child(3){background:#eadfc0}
+#slideMenu .slide-order-icon{font-size:34px;line-height:1;font-weight:700}
+#slideZoom{position:fixed;inset:0;z-index:99999;background:#050505;display:none;overflow:hidden;touch-action:none}
+#slideZoom.show{display:block}
+#slideZoomStage{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;overflow:hidden;touch-action:none}
+#slideZoomImg{max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;transform-origin:center center;user-select:none;-webkit-user-drag:none;touch-action:none}
+#slideZoomBack{position:absolute;top:16px;inset-inline-start:16px;z-index:2;width:46px;height:46px;border:0;border-radius:50%;background:rgba(255,255,255,.88);color:#244F5E;font-size:34px;line-height:42px;box-shadow:0 3px 12px rgba(0,0,0,.28);cursor:pointer}
+@media(max-width:520px){#slideMenu .slide-order-row{gap:8px;width:94vw}#slideMenu .slide-order-btn{min-height:104px;font-size:12.5px;border-radius:16px}.slide-order-icon{font-size:30px!important}}
+</style>
 </head>
 <body>
 <div id="bootLoader">
@@ -827,9 +843,16 @@ if ('serviceWorker' in navigator) {
   <!-- SLIDESHOW (full screen, tap to exit) -->
   <div class="screen" id="slideshow">
     <button class="music-btn slide-music" id="musicBtnSlide" onclick="event.stopPropagation();toggleMusic()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path class="wave-a" d="M15.5 8.5a5 5 0 0 1 0 7"/><path class="wave-b" d="M18.5 5.5a9 9 0 0 1 0 13"/><line class="mute-x" x1="16" y1="9" x2="22" y2="15"/><line class="mute-x" x1="22" y1="9" x2="16" y2="15"/></svg></button>
-    <div class="slideshow-body" id="slideBody" onclick="exitSlideshow()"></div>
+    <div class="slideshow-body" id="slideBody" onclick="openSlideZoom()"></div>
   </div>
 
+
+  <div id="slideZoom" aria-hidden="true">
+    <button id="slideZoomBack" type="button" onclick="closeSlideZoom(event)" aria-label="חזרה">‹</button>
+    <div id="slideZoomStage">
+      <img id="slideZoomImg" alt="">
+    </div>
+  </div>
 <button id="homeFab" onclick="showScreen('home')" title="מסך הבית">
   <svg viewBox="0 0 24 24" fill="none" stroke="#F3EAD8" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>
 </button>
@@ -910,11 +933,11 @@ if ('serviceWorker' in navigator) {
   <div class="screen" id="slideMenu">
     <div class="subhead"><h2>מצגת הדפים</h2></div>
     <div class="add-form">
-      <div class="note-box" style="font-size:14px;margin-bottom:16px">בחרו את סדר הדפים במצגת</div>
-
-      <button class="btn clay" onclick="startSlides('desc')">מהאחרון לראשון</button>
-      <button class="btn secondary" onclick="startSlides('asc')">מהראשון לאחרון</button>
-      <button class="btn secondary" onclick="startSlides('random')">אקראי</button>
+      <div class="slide-order-row">
+        <button class="slide-order-btn" onclick="startSlides('desc')" aria-label="מהאחרון לראשון"><span class="slide-order-icon">←</span><span>מהאחרון<br>לראשון</span></button>
+        <button class="slide-order-btn" onclick="startSlides('asc')" aria-label="מהראשון לאחרון"><span class="slide-order-icon">→</span><span>מהראשון<br>לאחרון</span></button>
+        <button class="slide-order-btn" onclick="startSlides('random')" aria-label="אקראי"><span class="slide-order-icon">⤨</span><span>אקראי</span></button>
+      </div>
     </div>
   </div>
 
@@ -927,7 +950,7 @@ if ('serviceWorker' in navigator) {
 let DATA = {books:[], cards:[]};
 let RAW_DATA = null;   // data.json exactly as fetched, before anything is layered on it
 
-const APP_VERSION = 'v86';
+const APP_VERSION = 'v87';
 const BOOK_COLORS=['#C0673B','#244F5E','#D9A441','#8A5A44','#3E6E5E','#B0443B','#6E5A8A','#4A7C8C','#C98A3B','#5E7A44','#A84B6B','#3B5468','#7A6A4F'];
 function bookColor(id){ return BOOK_COLORS[(id-1) % BOOK_COLORS.length]; }
 let books=[];
@@ -2512,5 +2535,46 @@ window.addEventListener('load', function(){ try{ loadData(); }catch(e){ document
 })();
 </script>
 
+
+<script id="shirli-v87-js">
+(function(){
+  let zoomScale=1, zoomX=0, zoomY=0;
+  let pinchStartDist=0, pinchStartScale=1, panStartX=0, panStartY=0, panOriginX=0, panOriginY=0;
+  let slideWasPlaying=false;
+  function zimg(){return document.getElementById('slideZoomImg')}
+  function applyZoom(){const im=zimg();if(im)im.style.transform='translate('+zoomX+'px,'+zoomY+'px) scale('+zoomScale+')'}
+  function resetZoom(){zoomScale=1;zoomX=0;zoomY=0;applyZoom()}
+  window.openSlideZoom=function(){
+    const c=(typeof slideOrder!=='undefined'&&slideOrder.length)?slideOrder[slideIdx]:null;
+    const v=document.getElementById('slideZoom'),im=zimg();
+    if(!v||!im||!c)return;
+    slideWasPlaying=!!slidePlaying;
+    if(slideWasPlaying)stopSlideshow();
+    im.src=c.img;resetZoom();v.classList.add('show');v.setAttribute('aria-hidden','false');
+  };
+  window.closeSlideZoom=function(ev){
+    if(ev){ev.preventDefault();ev.stopPropagation()}
+    const v=document.getElementById('slideZoom');if(v){v.classList.remove('show');v.setAttribute('aria-hidden','true')}
+    resetZoom();
+    if(slideWasPlaying&&typeof startSlideshow==='function')startSlideshow();
+  };
+  function dist(t1,t2){const dx=t1.clientX-t2.clientX,dy=t1.clientY-t2.clientY;return Math.hypot(dx,dy)}
+  document.addEventListener('DOMContentLoaded',function(){
+    const stage=document.getElementById('slideZoomStage'),im=zimg();if(!stage||!im)return;
+    stage.addEventListener('dblclick',function(e){window.closeSlideZoom(e)});
+    stage.addEventListener('wheel',function(e){e.preventDefault();zoomScale=Math.max(1,Math.min(6,zoomScale*(e.deltaY<0?1.15:0.87)));if(zoomScale===1){zoomX=0;zoomY=0}applyZoom()},{passive:false});
+    stage.addEventListener('touchstart',function(e){
+      if(e.touches.length>=2){pinchStartDist=dist(e.touches[0],e.touches[1]);pinchStartScale=zoomScale}
+      else if(e.touches.length===1&&zoomScale>1){panStartX=e.touches[0].clientX;panStartY=e.touches[0].clientY;panOriginX=zoomX;panOriginY=zoomY}
+    },{passive:false});
+    stage.addEventListener('touchmove',function(e){
+      e.preventDefault();
+      if(e.touches.length>=2&&pinchStartDist>0){zoomScale=Math.max(1,Math.min(6,pinchStartScale*(dist(e.touches[0],e.touches[1])/pinchStartDist)));if(zoomScale===1){zoomX=0;zoomY=0}applyZoom()}
+      else if(e.touches.length===1&&zoomScale>1){zoomX=panOriginX+(e.touches[0].clientX-panStartX);zoomY=panOriginY+(e.touches[0].clientY-panStartY);applyZoom()}
+    },{passive:false});
+    stage.addEventListener('touchend',function(e){if(e.touches.length<2)pinchStartDist=0},{passive:false});
+  });
+})();
+</script>
 </body>
 </html>
