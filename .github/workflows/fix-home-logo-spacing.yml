@@ -1,0 +1,44 @@
+name: Fix home logo spacing
+on:
+  push:
+    paths:
+      - '.github/workflows/fix-home-logo-spacing.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch home logo layout
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('sw.js')
+          s=p.read_text()
+          s=s.replace("const CACHE='shirli-v70';","const CACHE='shirli-v71';")
+          old="#home .topbar{padding:3px 16px 1px!important;min-height:76px!important;flex:0 0 auto!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:1px!important}"
+          new="#home .topbar{padding:4px 16px 4px!important;min-height:128px!important;flex:0 0 auto!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:flex-start!important;gap:5px!important;overflow:visible!important}"
+          if old not in s:
+              raise SystemExit('topbar pattern not found')
+          s=s.replace(old,new,1)
+          old="#home .home-logo{display:block!important;width:48px!important;height:48px!important;min-width:48px!important;min-height:48px!important;border-radius:50%!important;background:url('shirley-logo.png') center/cover no-repeat!important;box-shadow:0 2px 8px rgba(42,58,71,.14)!important;margin:0 auto!important}"
+          new="#home .home-logo{display:block!important;width:96px!important;height:96px!important;min-width:96px!important;min-height:96px!important;border-radius:50%!important;background:url('shirley-logo.png') center/cover no-repeat!important;box-shadow:0 2px 8px rgba(42,58,71,.14)!important;margin:0 auto!important;transform:none!important;position:relative!important;z-index:2!important}"
+          if old not in s:
+              raise SystemExit('logo pattern not found')
+          s=s.replace(old,new,1)
+          old="#home .topbar:after{content:'האוסף של שירלי';font-family:'Varela Round',sans-serif;font-size:17px;color:#244F5E;font-weight:700;text-align:center}"
+          new="#home .topbar:after{content:'האוסף של שירלי';font-family:'Varela Round',sans-serif;font-size:17px;color:#244F5E;font-weight:700;text-align:center;display:block!important;position:static!important;transform:none!important;line-height:1.2!important;margin:0!important}"
+          if old not in s:
+              raise SystemExit('title pattern not found')
+          s=s.replace(old,new,1)
+          p.write_text(s)
+          PY
+      - name: Commit patch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add sw.js
+          git commit -m "Fix home logo and title spacing"
+          git push
