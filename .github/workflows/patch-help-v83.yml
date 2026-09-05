@@ -1,4 +1,4 @@
-name: Patch Shirley v89
+name: Patch Shirley v90
 on:
   push:
     paths: ['.github/workflows/patch-help-v83.yml']
@@ -13,24 +13,36 @@ jobs:
           python - <<'PY'
           from pathlib import Path
           import re
+
           p=Path('index.html')
-          s=p.read_text(encoding='utf-8').replace("const APP_VERSION = 'v88';","const APP_VERSION = 'v89';")
+          s=p.read_text(encoding='utf-8').replace("const APP_VERSION = 'v89';","const APP_VERSION = 'v90';")
           p.write_text(s,encoding='utf-8')
+
           q=Path('sw.js')
           w=q.read_text(encoding='utf-8')
-          marker='      #products .products-grid{'
-          rule='      #products .subhead{position:relative!important}\n      #products .back{position:absolute!important;inset-inline-start:12px!important;top:50%!important;transform:translateY(-50%)!important;width:48px!important;height:48px!important;min-width:48px!important;min-height:48px!important;border-radius:50%!important;background:rgba(255,255,255,.92)!important;color:#244F5E!important;font-size:34px!important;font-weight:700!important;line-height:44px!important;display:flex!important;align-items:center!important;justify-content:center!important;z-index:5!important;box-shadow:0 3px 10px rgba(36,79,94,.18)!important}\n'
-          if '#products .back{' not in w:
-              if marker not in w: raise SystemExit('products css marker not found')
-              w=w.replace(marker,rule+marker,1)
-          w=re.sub(r"const CACHE='shirli-v\d+';","const CACHE='shirli-v64';",w)
+
+          old="""      function renderProducts(){let g=document.getElementById('productsGrid');if(!g)return;g.innerHTML=read().map(x=>'<div class=\"product-card\"><div class=\"product-img\">'+(x.image?'<img src=\"'+esc(x.image)+'\">':esc(x.emoji||'✨'))+'</div><div class=\"product-info\"><div class=\"product-name\">'+esc(x.name)+'</div>'+(x.price?'<div class=\"product-price\">'+esc(x.price)+' ₪</div>':'')+'<div class=\"product-cat\">'+esc(x.category||'מוצר')+'</div></div></div>').join('')}"""
+          new="""      function renderProducts(){let g=document.getElementById('productsGrid');if(!g)return;g.innerHTML=read().map(x=>'<div class=\"product-card\" data-product-name=\"'+esc(x.name)+'\"><div class=\"product-img\">'+(x.image?'<img src=\"'+esc(x.image)+'\">':esc(x.emoji||'✨'))+'</div><div class=\"product-info\"><div class=\"product-name\">'+esc(x.name)+'</div>'+(x.price?'<div class=\"product-price\">'+esc(x.price)+' ₪</div>':'')+'<div class=\"product-cat\">'+esc(x.category||'מוצר')+'</div></div></div>').join('');g.querySelectorAll('.product-card').forEach(card=>{const n=card.getAttribute('data-product-name');if(n==='תמונות'||n==='מדבקות'){card.style.cursor='pointer';card.onclick=()=>openProductFolder(n)}})}
+      function ensureProductFolder(){if(document.getElementById('productFolder'))return;let s=document.createElement('div');s.id='productFolder';s.className='screen';s.innerHTML='<div class=\"subhead\"><button class=\"back\" onclick=\"showScreen(\\'products\\')\">‹</button><h2 id=\"productFolderTitle\">מוצרים</h2></div><div class=\"products-grid\" id=\"productFolderGrid\"></div>';document.querySelector('.app')?.appendChild(s)}
+      window.openProductFolder=function(name){ensureProductFolder();const t=document.getElementById('productFolderTitle'),g=document.getElementById('productFolderGrid');t.textContent=name;if(name==='תמונות'){g.innerHTML='<div class=\"product-card\" id=\"portraitLink\"><div class=\"product-img\"><img src=\"/shirli/images/30.jpg\"></div><div class=\"product-info\"><div class=\"product-name\">דיוקנאות</div><div class=\"product-cat\">מעבר לספר הדיוקנאות</div></div></div>';g.querySelector('#portraitLink').onclick=()=>{if(typeof openBook==='function')openBook(9)}}else if(name==='מדבקות'){const samples=[['חמור',1],['קרנף',141],['זברה',157]];g.innerHTML=samples.map(x=>'<div class=\"product-card\"><div class=\"product-img\"><img src=\"/shirli/images/'+x[1]+'.jpg\"></div><div class=\"product-info\"><div class=\"product-name\">'+x[0]+'</div><div class=\"product-cat\">דוגמה למדבקה</div></div></div>').join('')}else{g.innerHTML=''}showScreen('productFolder')};"""
+          if old not in w: raise SystemExit('renderProducts block not found')
+          w=w.replace(old,new,1)
+
+          marker='      #products .product-card{'
+          extra='      #productFolder .products-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px 14px 24px}\n      #productFolder .product-card{background:rgba(255,255,255,.55);border:1px solid rgba(36,79,94,.14);border-radius:14px;overflow:hidden;box-shadow:0 3px 10px rgba(42,58,71,.11);cursor:pointer}\n      #productFolder .product-img{height:170px;background:#eadfc9;display:flex;align-items:center;justify-content:center;overflow:hidden}\n      #productFolder .product-img img{width:100%;height:100%;object-fit:contain;background:#fff}\n      #productFolder .product-info{text-align:center;padding:8px}\n      #productFolder .product-name{font-weight:700;color:#244F5E}\n      #productFolder .product-cat{font-size:11px;opacity:.7;margin-top:2px}\n      #productFolder .back{width:48px!important;height:48px!important;font-size:34px!important;display:flex!important;align-items:center!important;justify-content:center!important}\n'
+          if '#productFolder .products-grid{' not in w:
+              if marker not in w: raise SystemExit('product style marker not found')
+              w=w.replace(marker,extra+marker,1)
+
+          w=re.sub(r"const CACHE='shirli-v\d+';","const CACHE='shirli-v65';",w)
           q.write_text(w,encoding='utf-8')
+
           l=Path('landing.html')
-          x=re.sub(r'v=\d+','v=89',l.read_text(encoding='utf-8'))
+          x=re.sub(r'v=\d+','v=90',l.read_text(encoding='utf-8'))
           l.write_text(x,encoding='utf-8')
           PY
           git config user.name github-actions
           git config user.email github-actions@github.com
           git add index.html sw.js landing.html
-          git commit -m 'Enlarge products back arrow v89'
+          git commit -m 'Add product examples and portrait link v90'
           git push
