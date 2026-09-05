@@ -1,5 +1,5 @@
 /* Shirley app service worker */
-const CACHE='shirli-v64';
+const CACHE='shirli-v67';
 self.addEventListener('install',e=>self.skipWaiting());
 self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(xs=>Promise.all(xs.filter(x=>x!==CACHE).map(x=>caches.delete(x)))).then(()=>self.clients.claim())));
 
@@ -204,6 +204,7 @@ function cleanHtml(res){
     })();</script>`;
 
     if(!html.includes('shirli-v50-js')) html=html.replace('</body>',js+'\n</body>');
+    if(!html.includes('product-examples.js')) html=html.replace('</body>','<script src="/shirli/product-examples.js?v=91"></script>\n</body>');
     const headers=new Headers(res.headers);headers.delete('content-length');
     return new Response(html,{status:res.status,statusText:res.statusText,headers});
   });
