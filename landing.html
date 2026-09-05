@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<title>האוסף של שירלי</title>
+<style>
+:root{--green:#184f39;--cream:#f7f0df;--gold:#b48a45;--line:#75966c}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;background:var(--cream);font-family:Arial,sans-serif;color:var(--green);overflow:hidden}
+.wrap{height:100dvh;max-width:430px;margin:0 auto;background:radial-gradient(circle at 50% 14%,#fffaf0 0,#f7f0df 72%);padding:10px 14px calc(10px + env(safe-area-inset-bottom));text-align:center;display:flex;flex-direction:column;align-items:stretch;justify-content:space-evenly;position:relative;overflow:hidden}
+.brand{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:0}
+.logo{width:min(32vw,132px);height:min(32vw,132px);max-width:132px;max-height:132px;min-width:96px;min-height:96px;border-radius:50%;object-fit:cover;display:block;box-shadow:0 3px 14px rgba(0,0,0,.12);border:2px solid rgba(117,150,108,.45)}
+h1{font-family:Georgia,serif;font-weight:400;font-size:clamp(30px,9vw,42px);line-height:1;margin:0;color:var(--green)}
+.he{font-size:clamp(21px,6.2vw,28px);margin:0}.tag{font-size:clamp(14px,4vw,18px);color:var(--gold);line-height:1.25}
+.rule{width:62%;height:1px;background:linear-gradient(90deg,transparent,var(--line),transparent);margin:1px auto}
+.links{width:100%;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.link{display:flex;align-items:center;justify-content:center;gap:7px;min-height:56px;padding:6px 8px;border:1.5px solid var(--line);border-radius:20px;background:rgba(255,255,255,.5);text-decoration:none;color:var(--green);font-size:12px;font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.icon{font-size:22px;line-height:1}.small{font-size:10px;font-weight:400;display:block;margin-top:2px;word-break:break-word}.continue{font-size:11px;opacity:.83}
+@media(max-height:700px){.wrap{padding-top:6px;padding-bottom:6px}.brand{gap:3px}.logo{width:92px;height:92px;min-width:92px;min-height:92px}h1{font-size:30px}.he{font-size:20px}.tag{font-size:13px}.link{min-height:48px}.continue{font-size:10px}}
+</style>
+</head>
+<body>
+<div class="wrap" id="wrap">
+  <div class="brand">
+    <img class="logo" src="shirley-logo.jpg" alt="הלוגו של שירלי רגב">
+    <h1>Shirley Regev</h1>
+    <div class="he">שירלי רגב</div>
+    <div class="tag">בשפת הטבע<br>ליווי בחיבור לטבע הפנימי והחיצוני</div>
+    <div class="rule"></div>
+  </div>
+  <div class="links">
+    <a class="link" href="tel:+972523317195" onclick="hold(event)"><span class="icon">☎</span><span>052-3317195<span class="small">התקשרו לשירלי</span></span></a>
+    <a class="link" href="mailto:shirley.regev@gmail.com" onclick="hold(event)"><span class="icon">✉</span><span>אימייל<span class="small">shirley.regev@gmail.com</span></span></a>
+    <a class="link" href="https://www.instagram.com/shirley.regev/" target="_blank" rel="noopener" onclick="hold(event)"><span class="icon">◎</span><span>Instagram<span class="small">shirley.regev</span></span></a>
+    <a class="link" href="https://www.facebook.com/regev.shirley" target="_blank" rel="noopener" onclick="hold(event)"><span class="icon">f</span><span>Facebook<span class="small">שירלי רגב בשפת הטבע</span></span></a>
+  </div>
+  <div class="continue">נוגעים במסך כדי להמשיך · מעבר אוטומטי בעוד 3 שניות</div>
+</div>
+<script>
+if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{});}
+let timer=setTimeout(go,3000);
+function go(){ location.href='index.html?v=51&fromLanding=1'; }
+function hold(e){ e.stopPropagation(); clearTimeout(timer); }
+document.getElementById('wrap').addEventListener('click',function(e){ if(!e.target.closest('a')) go(); });
+</script>
+</body>
+</html>
