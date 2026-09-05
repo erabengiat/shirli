@@ -1,5 +1,5 @@
 /* Shirley app service worker */
-const CACHE='shirli-v63';
+const CACHE='shirli-v64';
 self.addEventListener('install',e=>self.skipWaiting());
 self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(xs=>Promise.all(xs.filter(x=>x!==CACHE).map(x=>caches.delete(x)))).then(()=>self.clients.claim())));
 
@@ -58,6 +58,8 @@ function cleanHtml(res){
       .slide-music{z-index:8!important}
 
       /* Products */
+      #products .subhead{position:relative!important}
+      #products .back{position:absolute!important;inset-inline-start:12px!important;top:50%!important;transform:translateY(-50%)!important;width:48px!important;height:48px!important;min-width:48px!important;min-height:48px!important;border-radius:50%!important;background:rgba(255,255,255,.92)!important;color:#244F5E!important;font-size:34px!important;font-weight:700!important;line-height:44px!important;display:flex!important;align-items:center!important;justify-content:center!important;z-index:5!important;box-shadow:0 3px 10px rgba(36,79,94,.18)!important}
       #products .products-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px 14px 24px}
       #products .product-card{background:rgba(255,255,255,.55);border:1px solid rgba(36,79,94,.14);border-radius:14px;overflow:hidden;box-shadow:0 3px 10px rgba(42,58,71,.11)}
       #products .product-img{height:145px;background:#eadfc9;display:flex;align-items:center;justify-content:center;font-size:38px;overflow:hidden}
