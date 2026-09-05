@@ -1,0 +1,52 @@
+name: Patch Shirley v84
+on:
+  push:
+    paths: ['.github/workflows/patch-v84-finalize.yml']
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Finalize home and help
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          p=Path('index.html'); s=p.read_text()
+
+          # Remove obsolete guide entries: four-card reading and random draw.
+          s=re.sub(r"\n\s*\['four','קריאת 4 דפים'.*?\],",'',s)
+          s=re.sub(r"\n\s*\['draw','שליפת דף'.*?\],",'',s)
+          s=s.replace("['info','מהי האפליקציה','הבית הדיגיטלי של אוסף הקולאז\\'ים של עירא. כל דף הוא יצירה, ולצידה השם וההערה שעירא כתבה. האוסף מחולק לספרים, והמספור רציף על פני כל האוסף.'],",
+                      "['info','מהי האפליקציה','הבית הדיגיטלי של האוסף של שירלי. האוסף מחולק לספרים, והמספור רציף על פני כל האוסף.'],")
+
+          # Make help info count every saved book, even empty local custom books.
+          old="const withNotes = books.reduce((s,b)=>s+b.cards.filter(c=>c.note).length,0);"
+          new="""const withNotes = books.reduce((s,b)=>s+b.cards.filter(c=>c.note).length,0);
+  let bookCount=books.length;
+  try{
+    const saved=JSON.parse(localStorage.getItem(BOOKS_KEY)||'[]');
+    const ids=new Set(books.map(b=>String(b.id)));
+    saved.forEach(b=>ids.add(String(b.id)));
+    bookCount=ids.size;
+  }catch(e){}"""
+          s=s.replace(old,new)
+          s=s.replace("'ספרים: ' + books.length + '\\n' +","'ספרים: ' + bookCount + '\\n' +")
+
+          # Force old backup/edit controls invisible if a stale HTML transform reintroduces them.
+          css='''\n<style id="shirli-v84-css">\n#help button[onclick*="exportBackup"],#help button[onclick*="importBackup"],#help button[onclick*="restoreFile"],#help button[onclick*="toggleEditingAllowed"],#help #publishWrap,#help #restoreFile{display:none!important}\n#home .topbar{min-height:102px!important;padding-top:10px!important}\n#home .home-logo{width:70px!important;height:70px!important;min-width:70px!important;min-height:70px!important;margin-top:4px!important}\n#home .home-title-v80{font-size:17px!important;margin-top:2px!important}\n#home .home-actions-grid-v80 .disc{width:58px!important;height:58px!important;min-width:58px!important;min-height:58px!important}\n#home .home-actions-grid-v80 .disc svg{width:30px!important;height:30px!important}\n#home .home-actions-grid-v80 .tile:nth-child(1) .disc{background:linear-gradient(180deg,#D97B55,#B94E2D)!important}\n#home .home-actions-grid-v80 .tile:nth-child(2) .disc{background:linear-gradient(180deg,#315A68,#173844)!important}\n#home .home-actions-grid-v80 .tile:nth-child(3) .disc{background:linear-gradient(180deg,#D6AE45,#A97818)!important}\n#home .home-actions-grid-v80 .tile:nth-child(4) .disc{background:linear-gradient(180deg,#4E8998,#286574)!important}\n#home .home-actions-grid-v80 .tile:nth-child(5) .disc{background:linear-gradient(180deg,#C78943,#9E5E20)!important}\n#home .home-actions-grid-v80 .tile:nth-child(6) .disc{background:linear-gradient(180deg,#8A6CAA,#624A82)!important}\n#home .home-actions-grid-v80 .tile:nth-child(7) .disc{background:linear-gradient(180deg,#5D8E78,#376754)!important}\n#home .home-actions-grid-v80 .tile:nth-child(8) .disc{background:linear-gradient(180deg,#B85F7C,#8D3E59)!important}\n</style>\n'''
+          if 'shirli-v84-css' not in s: s=s.replace('</head>',css+'</head>')
+          s=s.replace("const APP_VERSION = 'v83';","const APP_VERSION = 'v84';")
+          p.write_text(s)
+
+          # cache bust
+          sw=Path('sw.js'); w=sw.read_text(); w=re.sub(r"const CACHE='shirli-v\d+';","const CACHE='shirli-v59';",w); sw.write_text(w)
+          land=Path('landing.html'); l=land.read_text(); l=l.replace('v=81','v=84').replace('v=82','v=84').replace('v=83','v=84'); land.write_text(l)
+          PY
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add index.html sw.js landing.html
+          git commit -m 'Finalize Shirley home icons and help v84'
+          git push
