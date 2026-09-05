@@ -8,20 +8,22 @@
 :root{--green:#184f39;--cream:#f7f0df;--gold:#b48a45;--line:#75966c}
 *{box-sizing:border-box}
 html,body{margin:0;width:100%;height:100%;background:var(--cream);font-family:Arial,sans-serif;color:var(--green);overflow:hidden}
-.wrap{height:100dvh;max-width:430px;margin:0 auto;background:radial-gradient(circle at 50% 14%,#fffaf0 0,#f7f0df 72%);padding:18px 16px calc(18px + env(safe-area-inset-bottom));text-align:center;display:flex;flex-direction:column;align-items:stretch;justify-content:space-evenly;position:relative}
-.brand{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:4px 0}
-h1{font-family:Georgia,serif;font-weight:400;font-size:clamp(36px,11vw,48px);line-height:1;margin:0;color:var(--green)}
-.he{font-size:clamp(24px,7vw,31px);margin:0}.tag{font-size:clamp(17px,5vw,21px);color:var(--gold);line-height:1.35}
-.rule{width:68%;height:1px;background:linear-gradient(90deg,transparent,var(--line),transparent);margin:2px auto}
-.links{width:100%;display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.link{display:flex;align-items:center;justify-content:center;gap:8px;min-height:66px;padding:8px 9px;border:1.5px solid var(--line);border-radius:22px;background:rgba(255,255,255,.5);text-decoration:none;color:var(--green);font-size:13px;font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,.05)}
-.icon{font-size:25px;line-height:1}.small{font-size:11px;font-weight:400;display:block;margin-top:3px;word-break:break-word}.continue{font-size:13px;opacity:.83}
-@media(max-height:680px){.wrap{padding-top:10px;padding-bottom:10px}.brand{gap:5px}h1{font-size:34px}.he{font-size:22px}.tag{font-size:15px}.link{min-height:54px}.continue{font-size:11px}}
+.wrap{height:100dvh;max-width:430px;margin:0 auto;background:radial-gradient(circle at 50% 14%,#fffaf0 0,#f7f0df 72%);padding:10px 14px calc(10px + env(safe-area-inset-bottom));text-align:center;display:flex;flex-direction:column;align-items:stretch;justify-content:space-evenly;position:relative;overflow:hidden}
+.brand{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:0}
+.logo{width:min(32vw,132px);height:min(32vw,132px);max-width:132px;max-height:132px;min-width:96px;min-height:96px;border-radius:50%;object-fit:cover;display:block;box-shadow:0 3px 14px rgba(0,0,0,.12);border:2px solid rgba(117,150,108,.45)}
+h1{font-family:Georgia,serif;font-weight:400;font-size:clamp(30px,9vw,42px);line-height:1;margin:0;color:var(--green)}
+.he{font-size:clamp(21px,6.2vw,28px);margin:0}.tag{font-size:clamp(14px,4vw,18px);color:var(--gold);line-height:1.25}
+.rule{width:62%;height:1px;background:linear-gradient(90deg,transparent,var(--line),transparent);margin:1px auto}
+.links{width:100%;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.link{display:flex;align-items:center;justify-content:center;gap:7px;min-height:56px;padding:6px 8px;border:1.5px solid var(--line);border-radius:20px;background:rgba(255,255,255,.5);text-decoration:none;color:var(--green);font-size:12px;font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.icon{font-size:22px;line-height:1}.small{font-size:10px;font-weight:400;display:block;margin-top:2px;word-break:break-word}.continue{font-size:11px;opacity:.83}
+@media(max-height:700px){.wrap{padding-top:6px;padding-bottom:6px}.brand{gap:3px}.logo{width:92px;height:92px;min-width:92px;min-height:92px}h1{font-size:30px}.he{font-size:20px}.tag{font-size:13px}.link{min-height:48px}.continue{font-size:10px}}
 </style>
 </head>
 <body>
 <div class="wrap" id="wrap">
   <div class="brand">
+    <img class="logo" src="shirley-logo.jpg" alt="הלוגו של שירלי רגב">
     <h1>Shirley Regev</h1>
     <div class="he">שירלי רגב</div>
     <div class="tag">בשפת הטבע<br>ליווי בחיבור לטבע הפנימי והחיצוני</div>
@@ -38,7 +40,7 @@ h1{font-family:Georgia,serif;font-weight:400;font-size:clamp(36px,11vw,48px);lin
 <script>
 if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{});}
 let timer=setTimeout(go,3000);
-function go(){ location.href='index.html?v=50&fromLanding=1'; }
+function go(){ location.href='index.html?v=51&fromLanding=1'; }
 function hold(e){ e.stopPropagation(); clearTimeout(timer); }
 document.getElementById('wrap').addEventListener('click',function(e){ if(!e.target.closest('a')) go(); });
 </script>
