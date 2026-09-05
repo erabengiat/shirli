@@ -1,4 +1,4 @@
-name: Patch Product Examples
+name: Fix Shared Collection Branding
 on:
   push:
     paths:
@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: python -c "from pathlib import Path; import re; p=Path('sw.js'); s=p.read_text(encoding='utf-8'); old=\"    if(!html.includes('shirli-v50-js')) html=html.replace('</body>',js+'\\\\n</body>');\"; new=old+\"\\n    if(!html.includes('product-examples.js')) html=html.replace('</body>','<script src=\\\"/shirli/product-examples.js?v=91\\\"></script>\\\\n</body>');\"; assert old in s; s=s.replace(old,new,1); s=re.sub(r\"const CACHE='shirli-v\\d+';\",\"const CACHE='shirli-v67';\",s); p.write_text(s,encoding='utf-8')"
+      - run: python -c "from pathlib import Path; p=Path('view.html'); s=p.read_text(encoding='utf-8'); s=s.replace(\"<title>סול קולאז' של עירא — תצוגה</title>\",\"<title>האוסף של שירלי — תצוגה</title>\",1); s=s.replace(\"background:url('logo.png') center/cover no-repeat\",\"background:url('shirley-logo.png') center/cover no-repeat\"); marker='</title>'; meta='\\n<meta property=\\\"og:title\\\" content=\\\"האוסף של שירלי\\\">\\n<meta property=\\\"og:description\\\" content=\\\"האוסף של שירלי רגב\\\">\\n<meta property=\\\"og:image\\\" content=\\\"https://erabengiat.github.io/shirli/shirley-logo.png\\\">\\n<meta name=\\\"twitter:card\\\" content=\\\"summary_large_image\\\">\\n<meta name=\\\"twitter:image\\\" content=\\\"https://erabengiat.github.io/shirli/shirley-logo.png\\\">\\n<link rel=\\\"icon\\\" href=\\\"shirley-logo.png\\\">'; s=s.replace(marker,marker+meta,1) if 'og:image' not in s else s; p.write_text(s,encoding='utf-8')"
       - run: git config user.name github-actions
       - run: git config user.email github-actions@github.com
-      - run: git add sw.js && git commit -m 'Inject product examples script' && git push
+      - run: git add view.html && git commit -m 'Use Shirley logo and metadata in shared viewer' && git push
